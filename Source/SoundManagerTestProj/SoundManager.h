@@ -13,6 +13,7 @@
 class SOUNDMANAGERTESTPROJ_API SoundManager : public TSingleton<SoundManager>
 {
 	TWeakObjectPtr<ABGMActor> m_pBGMActor;
+	TWeakObjectPtr<USoundConcurrency> m_pConcurrency;
 	TMap<FString, USoundBase*> m_SoundMap;
 
 	TWeakObjectPtr<UWorld> m_pWorld;
@@ -22,10 +23,11 @@ public:
 	SoundManager();
 	~SoundManager();
 
-	void Initialize(UWorld* InWorld) { m_pWorld = InWorld; }
+	void Initialize(UWorld* InWorld);
 
-	void Load(const FString& InPath);
-	void PlayEffect();
-	void PlayBGM(const FString& InPath);
+	bool Load(const FString& InPath);
+	void PlayEffect(const FString& InPath);
+	void PlayBGM(const FString& InPath, bool InIsFadeIn = false, float InFadeInDuration = 1.0f, float InFadeVolumeLevel = 1.0f);
+	void StopBGM(bool InIsFadeOut = false, float InFadeOutDuration = 1.0f, float InFadeVolumeLevel = 1.0f);
 
 };

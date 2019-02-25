@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Sound/AmbientSound.h"
 #include "BGMActor.generated.h"
 
 UCLASS()
-class SOUNDMANAGERTESTPROJ_API ABGMActor : public AActor
+class SOUNDMANAGERTESTPROJ_API ABGMActor : public AAmbientSound
 {
 	GENERATED_BODY()
 	
@@ -20,9 +21,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	void PlayBGM(USoundBase* InSound, bool IsFadeIn = false, float InFadeInDuration = 1.0f, float InFadeVolumeLevel = 1.0f);
+	void StopBGM(bool InIsFadeOut = false, float InFadeOutDuration = 1.0f, float InFadeVolumeLevel = 1.0f);
 
-	
-	
 };

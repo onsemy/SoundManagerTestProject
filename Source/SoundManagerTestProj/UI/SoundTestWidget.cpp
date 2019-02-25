@@ -13,6 +13,8 @@ bool USoundTestWidget::Initialize()
 		if (btnPlayEffect100) btnPlayEffect100->OnClicked.AddDynamic(this, &USoundTestWidget::OnClickPlayEffect100);
 		if (btnPlayBGMType1) btnPlayBGMType1->OnClicked.AddDynamic(this, &USoundTestWidget::OnClickPlayBGMType1);
 		if (btnPlayBGMType2) btnPlayBGMType2->OnClicked.AddDynamic(this, &USoundTestWidget::OnClickPlayBGMType2);
+		if (btnPlayBGMType1FadeIn) btnPlayBGMType1FadeIn->OnClicked.AddDynamic(this, &USoundTestWidget::OnClickPlayBGMType1FadeIn);
+		if (btnPlayBGMType2FadeIn) btnPlayBGMType2FadeIn->OnClicked.AddDynamic(this, &USoundTestWidget::OnClickPlayBGMType2FadeIn);
 
 		return true;
 	}
@@ -23,7 +25,7 @@ bool USoundTestWidget::Initialize()
 void USoundTestWidget::OnClickPlayEffect1()
 {
 	print(TEXT("OnClickPlayEffect1"));
-	SoundManager::GetInstance()->PlayEffect();
+	SoundManager::GetInstance()->PlayEffect(TEXT("SoundWave'/Engine/EngineSounds/WhiteNoise.WhiteNoise'"));
 }
 
 void USoundTestWidget::OnClickPlayEffect100()
@@ -31,20 +33,32 @@ void USoundTestWidget::OnClickPlayEffect100()
 	print(TEXT("OnClickPlayEffect100"));
 	for (int i = 0; i < 100; ++i)
 	{
-		SoundManager::GetInstance()->PlayEffect();
+		SoundManager::GetInstance()->PlayEffect(TEXT("SoundWave'/Engine/EngineSounds/WhiteNoise.WhiteNoise'"));
 	}
 }
 
 void USoundTestWidget::OnClickPlayBGMType1()
 {
 	print(TEXT("OnClickPlayBGMType1"));
-	SoundManager::GetInstance()->PlayBGM(TEXT("SoundWave'/Game/Sound/bgm_title_01.bgm_title_01'"));
+	SoundManager::GetInstance()->PlayBGM(TEXT("SoundWave'/Game/Sound/VR_object_grabbed_loop1.VR_object_grabbed_loop1'"));
 }
 
 void USoundTestWidget::OnClickPlayBGMType2()
 {
 	print(TEXT("OnClickPlayBGMType2"));
-	SoundManager::GetInstance()->PlayBGM(TEXT("SoundWave'/Engine/EngineSounds/WhiteNoise.WhiteNoise'"));
+	SoundManager::GetInstance()->PlayBGM(TEXT("SoundWave'/Game/Sound/VR_WorldMoveLoop_03.VR_WorldMoveLoop_03'"));
+}
+
+void USoundTestWidget::OnClickPlayBGMType1FadeIn()
+{
+	SoundManager::GetInstance()->StopBGM(true);
+	SoundManager::GetInstance()->PlayBGM(TEXT("SoundWave'/Game/Sound/VR_object_grabbed_loop1.VR_object_grabbed_loop1'"), true);
+}
+
+void USoundTestWidget::OnClickPlayBGMType2FadeIn()
+{
+	SoundManager::GetInstance()->StopBGM(true);
+	SoundManager::GetInstance()->PlayBGM(TEXT("SoundWave'/Game/Sound/VR_WorldMoveLoop_03.VR_WorldMoveLoop_03'"), true);
 }
 
 #undef print

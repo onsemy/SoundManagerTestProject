@@ -26,6 +26,10 @@ public:
 	void OnClickPlayBGMType1();
 	UFUNCTION()
 	void OnClickPlayBGMType2();
+	UFUNCTION()
+	void OnClickPlayBGMType1FadeIn();
+	UFUNCTION()
+	void OnClickPlayBGMType2FadeIn();
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
@@ -39,5 +43,11 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
 	UButton* btnPlayBGMType2 = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
+	UButton* btnPlayBGMType1FadeIn = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
+	UButton* btnPlayBGMType2FadeIn = nullptr;
 
 };
