@@ -11,12 +11,14 @@ SoundManager::SoundManager()
 
 SoundManager::~SoundManager()
 {
-	m_SoundMap.Empty();
+	UnloadAll();
+
 	for (TWeakObjectPtr<ABGMActor> BGMActor : m_pBGMActorList)
 	{
 		BGMActor->RemoveFromRoot();
 	}
 	m_pBGMActorList.Empty();
+
 	m_pBGMConcurrency = nullptr;
 	m_pEffectConcurrency = nullptr;
 	m_pWorld = nullptr;
