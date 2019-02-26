@@ -6,13 +6,18 @@
 
 SoundManager::SoundManager()
 {
+	m_nCurrentBGMIndex = 0;
 }
 
 SoundManager::~SoundManager()
 {
 	m_SoundMap.Empty();
-	m_pBGMActor = nullptr;
-	m_pConcurrency = nullptr;
+	for (TWeakObjectPtr<ABGMActor> BGMActor : m_pBGMActorList)
+	{
+		BGMActor->RemoveFromRoot();
+	}
+	m_pBGMActorList.Empty();
+	m_pEffectConcurrency = nullptr;
 	m_pWorld = nullptr;
 }
 
@@ -20,17 +25,14 @@ void SoundManager::Initialize(UWorld* InWorld)
 {
 	m_pWorld = InWorld;
 
-	for (TActorIterator<ABGMActor> ActorIter(InWorld); ActorIter; ++ActorIter)
+	for (int i = 0; i < 2; ++i)
 	{
-		ABGMActor* Sound = *ActorIter;
-		//if (Sound->GetName().Equals(TEXT("bgm")))
-		{
-			m_pBGMActor = Sound;
-			break;
-		}
+		ABGMActor* Actor = InWorld->SpawnActor<ABGMActor>();
+		Actor->AddToRoot();
+		m_pBGMActorList.Add(Actor);
 	}
 
-	m_pConcurrency = LoadObject<USoundConcurrency>(nullptr, TEXT("SoundConcurrency'/Game/Sound/NewSoundConcurrency.NewSoundConcurrency'"));
+	m_pEffectConcurrency = LoadObject<USoundConcurrency>(nullptr, TEXT("SoundConcurrency'/Game/Sound/NewSoundConcurrency.NewSoundConcurrency'"));
 }
 
 bool SoundManager::Load(const FString& InPath)
@@ -50,6 +52,11 @@ bool SoundManager::Load(const FString& InPath)
 	return true;
 }
 
+void SoundManager::UnloadAll()
+{
+	m_SoundMap.Empty();
+}
+
 void SoundManager::PlayEffect(const FString& InPath)
 {
 	if (Load(InPath) == false)
@@ -57,27 +64,26 @@ void SoundManager::PlayEffect(const FString& InPath)
 		return;
 	}
 
-	UGameplayStatics::PlaySound2D(GetWorld(), m_SoundMap[InPath], 1.0f, 1.0f, 0.0f, m_pConcurrency.Get());
+	UGameplayStatics::PlaySound2D(GetWorld(), m_SoundMap[InPath], 1.0f, 1.0f, 0.0f, m_pEffectConcurrency.Get());
 }
 
-void SoundManager::PlayBGM(const FString& InPath, bool InIsFadeIn, float InFadeInDuration, float InFadeVolumeLevel)
+void SoundManager::PlayBGM(int InPlayIndex, const FString& InPath, bool InIsFadeIn, float InFadeInDuration, float InFadeVolumeLevel)
 {
-	if (m_pBGMActor.IsValid())
+	if (m_pBGMActorList[InPlayIndex].IsValid())
 	{
 		if (Load(InPath) == false)
 		{
 			return;
 		}
 
-		m_pBGMActor->PlayBGM(m_SoundMap[InPath], InIsFadeIn, InFadeInDuration, InFadeVolumeLevel);
-		//UGameplayStatics::PlaySound2D(GetWorld(), m_SoundMap[InPath], 1.0f, 1.0f, 0.0f, m_pConcurrency.Get(), m_pBGMActor.Get());
+		m_pBGMActorList[InPlayIndex]->PlayBGM(m_SoundMap[InPath], InIsFadeIn, InFadeInDuration, InFadeVolumeLevel);
 	}
 }
 
 void SoundManager::StopBGM(int InStopIndex, bool InIsFadeOut /*= false*/, float InFadeOutDuration /*= 1.0f*/, float InFadeVolumeLevel /*= 1.0f*/)
 {
-	if (m_pBGMActor.IsValid())
+	if (m_pBGMActorList[InStopIndex].IsValid())
 	{
-		m_pBGMActor->StopBGM(InIsFadeOut, InFadeOutDuration, InFadeVolumeLevel);
+		m_pBGMActorList[InStopIndex]->StopBGM(InIsFadeOut, InFadeOutDuration, InFadeVolumeLevel);
 	}
 }

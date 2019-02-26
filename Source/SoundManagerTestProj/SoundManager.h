@@ -12,12 +12,14 @@
  */
 class SOUNDMANAGERTESTPROJ_API SoundManager : public TSingleton<SoundManager>
 {
-	TWeakObjectPtr<ABGMActor> m_pBGMActor;
-	TWeakObjectPtr<USoundConcurrency> m_pConcurrency;
-	TMap<FString, USoundBase*> m_SoundMap;
+	TArray<TWeakObjectPtr<ABGMActor>> m_pBGMActorList;
+	TWeakObjectPtr<USoundConcurrency> m_pBGMConcurrency;
+	TWeakObjectPtr<USoundConcurrency> m_pEffectConcurrency;
+	TMap<FString, USoundWave*> m_SoundMap;
 
 	TWeakObjectPtr<UWorld> m_pWorld;
 	UWorld* GetWorld() const { return m_pWorld.Get(); }
+	int m_nCurrentBGMIndex;
 
 public:
 	SoundManager();
@@ -26,8 +28,12 @@ public:
 	void Initialize(UWorld* InWorld);
 
 	bool Load(const FString& InPath);
+	void UnloadAll();
 	void PlayEffect(const FString& InPath);
-	void PlayBGM(const FString& InPath, bool InIsFadeIn = false, float InFadeInDuration = 1.0f, float InFadeVolumeLevel = 1.0f);
+	void PlayBGM(int InPlayIndex, const FString& InPath, bool InIsFadeIn = false, float InFadeInDuration = 1.0f, float InFadeVolumeLevel = 1.0f);
 	void StopBGM(int InStopIndex, bool InIsFadeOut = false, float InFadeOutDuration = 1.0f, float InFadeVolumeLevel = 1.0f);
+
+	void SetBGMConcurrency(USoundConcurrency* InConcurrency) { m_pBGMConcurrency = InConcurrency; }
+	void SetEffectConcurrency(USoundConcurrency* InConcurrency) { m_pEffectConcurrency = InConcurrency; }
 
 };
