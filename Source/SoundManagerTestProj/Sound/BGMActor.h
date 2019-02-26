@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Sound/AmbientSound.h"
+#include "Components/AudioComponent.h"
 #include "BGMActor.generated.h"
 
 UCLASS()
@@ -25,5 +26,6 @@ protected:
 public:	
 	void PlayBGM(USoundWave* InSound, bool IsFadeIn = false, float InFadeInDuration = 1.0f, float InFadeVolumeLevel = 1.0f);
 	void StopBGM(bool InIsFadeOut = false, float InFadeOutDuration = 1.0f, float InFadeVolumeLevel = 1.0f);
+	bool IsPlaying() { return GetAudioComponent()->IsPlaying(); }
 
 };
