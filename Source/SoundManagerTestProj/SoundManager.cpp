@@ -94,6 +94,13 @@ void SoundManager::PlayBGM(const FString& InPath, bool InIsFadeIn, float InFadeI
 
 void SoundManager::StopBGM(bool InIsFadeOut /*= false*/, float InFadeOutDuration /*= 1.0f*/, float InFadeVolumeLevel /*= 1.0f*/)
 {
-	m_pBGMActorList[m_nCurrentBGMIndex]->StopBGM(InIsFadeOut, InFadeOutDuration, InFadeVolumeLevel);
-	m_nCurrentBGMIndex = (m_nCurrentBGMIndex + 1) % m_SoundMap.Num();
+	if (m_pBGMActorList[m_nCurrentBGMIndex]->IsPlaying())
+	{
+		m_pBGMActorList[m_nCurrentBGMIndex]->StopBGM(InIsFadeOut, InFadeOutDuration, InFadeVolumeLevel);
+		m_nCurrentBGMIndex = (m_nCurrentBGMIndex + 1) % m_pBGMActorList.Num();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to StopBGM - %d is not playing"), m_nCurrentBGMIndex);
+	}
 }
