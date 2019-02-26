@@ -4,7 +4,7 @@ This project is managing sound control with UnrealEngine function in Unreal Engi
 ## Features
 
 ### 1. Load/Play/Stop (Background Music, Effect)
-Load USoundWave through Reference Path(FString), and Play or stop Audio using that.
+Load `USoundWave` through Reference Path(FString), and Play or stop Audio using that.
 
 ```cpp
 SoundManager::GetInstance()->PlayEffect(TEXT("SoundWave'/Engine/EngineSounds/WhiteNoise.WhiteNoise'"));
@@ -18,7 +18,7 @@ SoundManager::GetInstance()->PlayEffect(TEXT("SoundWave'/Engine/EngineSounds/Whi
 ```
 
 ### 2. SetConcurrency
-You can use USoundConcurrency for BGM or Effect. When initialized SoundManager, set concurrency polity your owns.
+You can use `USoundConcurrency` for BGM or Effect. When initialized SoundManager, set concurrency polity your owns.
 
 ```cpp
 void SoundManager::Initialize(UWorld* InWorld)
