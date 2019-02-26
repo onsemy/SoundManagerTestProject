@@ -28,7 +28,7 @@ void SoundManager::Initialize(UWorld* InWorld)
 {
 	m_pWorld = InWorld;
 
-	m_pBGMConcurrency = LoadObject<USoundConcurrency>(nullptr, TEXT("SoundConcurrency'/Game/Sound/NewSoundConcurrency.NewSoundConcurrency'"));
+	m_pBGMConcurrency = LoadObject<USoundConcurrency>(nullptr, TEXT("SoundConcurrency'/Game/Sound/BGMConcurrency.BGMConcurrency'"));
 	m_pEffectConcurrency = LoadObject<USoundConcurrency>(nullptr, TEXT("SoundConcurrency'/Game/Sound/NewSoundConcurrency.NewSoundConcurrency'"));
 
 	for (int i = 0; i < 2; ++i)
