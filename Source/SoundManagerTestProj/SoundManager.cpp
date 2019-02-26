@@ -73,35 +73,27 @@ void SoundManager::PlayEffect(const FString& InPath)
 {
 	if (Load(InPath) == false)
 	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to PlayEffect - %s is invalid"), *InPath);
 		return;
 	}
 
+	m_SoundMap[InPath]->bLooping = false;
 	UGameplayStatics::PlaySound2D(GetWorld(), m_SoundMap[InPath], 1.0f, 1.0f, 0.0f, m_pEffectConcurrency.Get());
 }
 
-void SoundManager::PlayBGM(int InPlayIndex, const FString& InPath, bool InIsFadeIn, float InFadeInDuration, float InFadeVolumeLevel)
+void SoundManager::PlayBGM(const FString& InPath, bool InIsFadeIn, float InFadeInDuration, float InFadeVolumeLevel)
 {
-	if (m_pBGMActorList[m_nCurrentBGMIndex].IsValid())
+	if (Load(InPath) == false)
 	{
-		if (Load(InPath) == false)
-		{
-			return;
-		}
-
-		m_pBGMActorList[m_nCurrentBGMIndex]->PlayBGM(m_SoundMap[InPath], InIsFadeIn, InFadeInDuration, InFadeVolumeLevel);
-		m_nCurrentBGMIndex = (m_nCurrentBGMIndex + 1) % m_SoundMap.Num();
+		UE_LOG(LogTemp, Error, TEXT("Failed to PlayBGM - %s is invalid"), *InPath);
+		return;
 	}
+
+	m_pBGMActorList[m_nCurrentBGMIndex]->PlayBGM(m_SoundMap[InPath], InIsFadeIn, InFadeInDuration, InFadeVolumeLevel);
 }
 
-void SoundManager::StopBGM(int InStopIndex, bool InIsFadeOut /*= false*/, float InFadeOutDuration /*= 1.0f*/, float InFadeVolumeLevel /*= 1.0f*/)
+void SoundManager::StopBGM(bool InIsFadeOut /*= false*/, float InFadeOutDuration /*= 1.0f*/, float InFadeVolumeLevel /*= 1.0f*/)
 {
-	for (TWeakObjectPtr<ABGMActor> Actor : m_pBGMActorList)
-	{
-		Actor->StopBGM();
-	}
-
-	//if (m_pBGMActorList[InStopIndex].IsValid())
-	//{
-	//	m_pBGMActorList[InStopIndex]->StopBGM(InIsFadeOut, InFadeOutDuration, InFadeVolumeLevel);
-	//}
+	m_pBGMActorList[m_nCurrentBGMIndex]->StopBGM(InIsFadeOut, InFadeOutDuration, InFadeVolumeLevel);
+	m_nCurrentBGMIndex = (m_nCurrentBGMIndex + 1) % m_SoundMap.Num();
 }

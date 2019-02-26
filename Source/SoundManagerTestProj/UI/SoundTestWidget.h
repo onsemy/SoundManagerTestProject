@@ -21,6 +21,8 @@ public:
 	UFUNCTION()
 	void OnClickPlayEffect1();
 	UFUNCTION()
+	void OnClickPlayEffectType2();
+	UFUNCTION()
 	void OnClickPlayEffect100();
 	UFUNCTION()
 	void OnClickPlayBGMType1();
@@ -38,6 +40,9 @@ public:
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
 	UButton* btnPlayEffect1 = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
+	UButton* btnPlayEffectType2 = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
 	UButton* btnPlayEffect100 = nullptr;
