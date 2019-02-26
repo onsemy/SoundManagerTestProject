@@ -74,7 +74,7 @@ void SoundManager::PlayBGM(const FString& InPath, bool InIsFadeIn, float InFadeI
 	}
 }
 
-void SoundManager::StopBGM(bool InIsFadeOut /*= false*/, float InFadeOutDuration /*= 1.0f*/, float InFadeVolumeLevel /*= 1.0f*/)
+void SoundManager::StopBGM(int InStopIndex, bool InIsFadeOut /*= false*/, float InFadeOutDuration /*= 1.0f*/, float InFadeVolumeLevel /*= 1.0f*/)
 {
 	if (m_pBGMActor.IsValid())
 	{
