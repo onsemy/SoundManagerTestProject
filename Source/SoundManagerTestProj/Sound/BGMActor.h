@@ -21,7 +21,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	void PlayBGM(USoundBase* InSound, bool IsFadeIn = false, float InFadeInDuration = 1.0f, float InFadeVolumeLevel = 1.0f);
+	void PlayBGM(USoundWave* InSound, bool IsFadeIn = false, float InFadeInDuration = 1.0f, float InFadeVolumeLevel = 1.0f);
 	void StopBGM(bool InIsFadeOut = false, float InFadeOutDuration = 1.0f, float InFadeVolumeLevel = 1.0f);
 
 };

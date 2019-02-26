@@ -37,7 +37,7 @@ bool SoundManager::Load(const FString& InPath)
 {
 	if (m_SoundMap.Contains(InPath) == false)
 	{
-		USoundBase* Sound = LoadObject<USoundBase>(nullptr, *InPath);
+		USoundWave* Sound = LoadObject<USoundWave>(nullptr, *InPath);
 		if (Sound == nullptr)
 		{
 			UE_LOG(LogTemp, Error, TEXT("Failed to load sound - %s"), *InPath);

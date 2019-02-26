@@ -16,9 +16,11 @@ void ABGMActor::BeginPlay()
 	
 }
 
-void ABGMActor::PlayBGM(USoundBase* InSound, bool IsFadeIn, float InFadeInDuration, float InFadeVolumeLevel)
+void ABGMActor::PlayBGM(USoundWave* InSound, bool IsFadeIn, float InFadeInDuration, float InFadeVolumeLevel)
 {
+	InSound->bLooping = true;
 	GetAudioComponent()->SetSound(InSound);
+	
 	if (IsFadeIn)
 	{
 		FadeIn(InFadeInDuration, InFadeVolumeLevel);
