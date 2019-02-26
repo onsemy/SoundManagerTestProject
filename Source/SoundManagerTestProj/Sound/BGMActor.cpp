@@ -9,6 +9,11 @@ ABGMActor::ABGMActor()
 {
 }
 
+void ABGMActor::SetConcurrency(USoundConcurrency* InConcurrency)
+{
+	GetAudioComponent()->ConcurrencySettings = InConcurrency;
+}
+
 // Called when the game starts or when spawned
 void ABGMActor::BeginPlay()
 {

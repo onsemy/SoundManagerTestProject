@@ -26,5 +26,7 @@ void ASoundManagerTestProjGameModeBase::EndPlay(const EEndPlayReason::Type EndPl
 
 	SoundManager::ReleaseInstance();
 
+	GEngine->ForceGarbageCollection(true);
+
 	Super::EndPlay(EndPlayReason);
 }
