@@ -16,7 +16,11 @@ If you want to play cross fade for BGM, use this.
 ```cpp
 // When playing BGM already
 SoundManager::GetInstance()->PlayBGM(0, TEXT("SoundWave'/Engine/EngineSounds/WhiteNoise.WhiteNoise'"), true);
+
+// Also when playing BGM already
 SoundManager::GetInstance()->StopBGM(0);
+// If you want to stop with fade out, check second bool parameter
+SoundManager::GetInstance()->StopBGM(0, true); // default false.
 ```
 
 ### 2. SetConcurrency
