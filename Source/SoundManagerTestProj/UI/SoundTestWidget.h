@@ -40,6 +40,22 @@ public:
 	void OnClickPlayBGMType1FadeIn();
 	UFUNCTION()
 	void OnClickPlayBGMType2FadeIn();
+	UFUNCTION()
+	void OnClickEnvPlayBGMType1();
+	UFUNCTION()
+	void OnClickEnvPlayBGMType2();
+	UFUNCTION()
+	void OnClickEnvStopBGMType1();
+	UFUNCTION()
+	void OnClickEnvStopBGMType2();
+	UFUNCTION()
+	void OnClickEnvStopBGMType1FadeOut();
+	UFUNCTION()
+	void OnClickEnvStopBGMType2FadeOut();
+	UFUNCTION()
+	void OnClickEnvPlayBGMType1FadeIn();
+	UFUNCTION()
+	void OnClickEnvPlayBGMType2FadeIn();
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
@@ -74,5 +90,29 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
 	UButton* btnPlayBGMType2FadeIn = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
+	UButton* btnEnvPlayBGMType1 = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
+	UButton* btnEnvPlayBGMType2 = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
+	UButton* btnEnvStopBGMType1 = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
+	UButton* btnEnvStopBGMType2 = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
+	UButton* btnEnvStopBGMType1FadeOut = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
+	UButton* btnEnvStopBGMType2FadeOut = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
+	UButton* btnEnvPlayBGMType1FadeIn = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
+	UButton* btnEnvPlayBGMType2FadeIn = nullptr;
 
 };
