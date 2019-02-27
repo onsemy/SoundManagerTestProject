@@ -52,12 +52,15 @@ void ABGMActor::Tick(float DeltaSeconds)
 void ABGMActor::PlayBGM(USoundWave* InSound, bool InIsCrossFade, float InCrossFadeDuration)
 {
 	InSound->bLooping = true;
-	// NOTE(JJO): For cross fade (swap)
-	for (int i = 0; i < 2; ++i)
+	if (m_AudioComponentList.Num() == 0)
 	{
-		UAudioComponent* AudioComponent = UGameplayStatics::CreateSound2D(GetWorld(), InSound, 1.0f, 1.0f, 0.0f, m_pSoundConcurrency.Get(), false, false);
-		AudioComponent->AddToRoot();
-		m_AudioComponentList.Add(AudioComponent);
+		// NOTE(JJO): For cross fade (swap)
+		for (int i = 0; i < 2; ++i)
+		{
+			UAudioComponent* AudioComponent = UGameplayStatics::CreateSound2D(GetWorld(), InSound, 1.0f, 1.0f, 0.0f, m_pSoundConcurrency.Get(), false, false);
+			AudioComponent->AddToRoot();
+			m_AudioComponentList.Add(AudioComponent);
+		}
 	}
 
 	PlayBGM_Internal(InSound, InIsCrossFade, InCrossFadeDuration);
@@ -96,6 +99,8 @@ void ABGMActor::SetVolume(float InVolume, bool InIsTweening /*= false*/, float I
 
 void ABGMActor::PlayBGM_Internal(USoundWave* InSound, bool InIsCrossFade /*= false*/, float InCrossFadeDuration /*= 1.0f*/)
 {
+	bool IsAlreadyFadeIn = false;
+	bool IsAlreadyFadeOut = false;
 	for (auto CompIter = m_AudioComponentList.CreateIterator(); CompIter; ++CompIter)
 	{
 		TWeakObjectPtr<UAudioComponent> Comp = *CompIter;
@@ -103,17 +108,35 @@ void ABGMActor::PlayBGM_Internal(USoundWave* InSound, bool InIsCrossFade /*= fal
 		{
 			if (Comp->IsPlaying() == false)
 			{
-				Comp->FadeIn(InCrossFadeDuration);
+				// NOTE(JJO): For first called PlayBGM
+				if (IsAlreadyFadeIn == false)
+				{
+					Comp->SetSound(InSound);
+					Comp->FadeIn(InCrossFadeDuration);
+					IsAlreadyFadeIn = true;
+				}
 			}
 			else
 			{
-				Comp->FadeOut(InCrossFadeDuration, 1.0f);
+				if (IsAlreadyFadeOut == false)
+				{
+					Comp->FadeOut(InCrossFadeDuration, 0.0f);
+					IsAlreadyFadeOut = true;
+				}
 			}
 		}
 		else
 		{
-			Comp->Play();
-			break;
+			if (IsAlreadyFadeIn == false)
+			{
+				Comp->SetSound(InSound);
+				Comp->Play();
+				IsAlreadyFadeIn = true;
+			}
+			else
+			{
+				Comp->Stop();
+			}
 		}
 	}
 }
@@ -127,13 +150,12 @@ void ABGMActor::StopBGM_Internal(bool InIsFadeOut /*= false*/, float InFadeOutDu
 		{
 			if (Comp->IsPlaying())
 			{
-				Comp->FadeOut(InFadeOutDuration, 1.0f);
+				Comp->FadeOut(InFadeOutDuration, 0.0f);
 			}
 		}
 		else
 		{
 			Comp->Stop();
-			break;
 		}
 	}
 }
