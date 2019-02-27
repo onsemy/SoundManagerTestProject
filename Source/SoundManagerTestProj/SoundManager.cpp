@@ -13,8 +13,13 @@ SoundManager::~SoundManager()
 {
 	UnloadAll();
 
-	m_pBGMActor->RemoveFromRoot();
-	m_pBGMActor = nullptr;
+	for (auto ActorIter = m_BGMActorMap.CreateIterator(); ActorIter; ++ActorIter)
+	{
+		TWeakObjectPtr<ABGMActor> Actor = ActorIter.Value();
+		Actor->RemoveFromRoot();
+		Actor = nullptr;
+	}
+	m_BGMActorMap.Empty();
 
 	m_pBGMConcurrency = nullptr;
 	m_pEffectConcurrency = nullptr;
@@ -28,9 +33,14 @@ void SoundManager::Initialize(UWorld* InWorld)
 	m_pBGMConcurrency = LoadObject<USoundConcurrency>(nullptr, TEXT("SoundConcurrency'/Game/Sound/BGMConcurrency.BGMConcurrency'"));
 	m_pEffectConcurrency = LoadObject<USoundConcurrency>(nullptr, TEXT("SoundConcurrency'/Game/Sound/NewSoundConcurrency.NewSoundConcurrency'"));
 
-	m_pBGMActor = InWorld->SpawnActor<ABGMActor>();
-	m_pBGMActor->SetConcurrency(m_pBGMConcurrency.Get());
-	m_pBGMActor->AddToRoot();
+	for (int i = 0; i < 2; ++i)
+	{
+		ABGMActor* Actor = InWorld->SpawnActor<ABGMActor>();
+		Actor->SetConcurrency(m_pBGMConcurrency.Get());
+		Actor->AddToRoot();
+
+		m_BGMActorMap.Add(i, Actor);
+	}
 }
 
 bool SoundManager::Load(const FString& InPath)
@@ -82,10 +92,10 @@ void SoundManager::PlayBGM(int InBGMType, const FString& InPath, bool InIsFadeIn
 		return;
 	}
 
-	m_pBGMActor->PlayBGM(InBGMType, m_SoundMap[InPath], InIsFadeIn, InFadeInDuration);
+	m_BGMActorMap[InBGMType]->PlayBGM(m_SoundMap[InPath], InIsFadeIn, InFadeInDuration);
 }
 
 void SoundManager::StopBGM(int InBGMType, bool InIsFadeOut /*= false*/, float InFadeOutDuration /*= 1.0f*/)
 {
-	m_pBGMActor->StopBGM(InBGMType, InIsFadeOut, InFadeOutDuration);
+	m_BGMActorMap[InBGMType]->StopBGM(InIsFadeOut, InFadeOutDuration);
 }

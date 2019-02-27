@@ -12,7 +12,7 @@
  */
 class SOUNDMANAGERTESTPROJ_API SoundManager : public TSingleton<SoundManager>
 {
-	TWeakObjectPtr<ABGMActor> m_pBGMActor;
+	TMap<int, TWeakObjectPtr<ABGMActor>> m_BGMActorMap;
 	TWeakObjectPtr<USoundConcurrency> m_pBGMConcurrency;
 	TWeakObjectPtr<USoundConcurrency> m_pEffectConcurrency;
 	TMap<FString, USoundWave*> m_SoundMap;

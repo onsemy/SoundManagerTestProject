@@ -16,68 +16,61 @@ void ABGMActor::SetConcurrency(USoundConcurrency* InConcurrency)
 
 void ABGMActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	for (auto MapIter = m_AudioComponentMap.CreateIterator(); MapIter; ++MapIter)
+	for (auto CompIter = m_AudioComponentList.CreateIterator(); CompIter; ++CompIter)
 	{
-		for (auto CompIter = MapIter.Value().CreateIterator(); CompIter; ++CompIter)
-		{
-			TWeakObjectPtr<UAudioComponent> Comp = *CompIter;
-			Comp->RemoveFromRoot();
-			Comp = nullptr;
-		}
-		MapIter.Value().Empty();
+		TWeakObjectPtr<UAudioComponent> Comp = *CompIter;
+		Comp->RemoveFromRoot();
+		Comp = nullptr;
 	}
-	m_AudioComponentMap.Empty();
+
+	m_AudioComponentList.Empty();
 
 	Super::EndPlay(EndPlayReason);
 }
 
 void ABGMActor::Tick(float DeltaSeconds)
 {
-	if (IsVolumeTweening)
+	if (m_bIsVolumeTweening)
 	{
 		// TODO(JJO): tweening volume
 		//
+		m_fCurrentDuration += DeltaSeconds;
+		if (m_fCurrentDuration >= m_fTargetDuration)
+		{
+			m_fCurrentDuration = m_fTargetDuration;
+			m_bIsVolumeTweening = false;
+		}
+
+		for (auto CompIter = m_AudioComponentList.CreateIterator(); CompIter; ++CompIter)
+		{
+			TWeakObjectPtr<UAudioComponent> Comp = *CompIter;
+			Comp->VolumeMultiplier = FMath::Lerp(m_fOriginVolume, m_fTargetVolume, m_fCurrentDuration);
+		}
 	}
 }
 
-void ABGMActor::PlayBGM(int InBGMType, USoundWave* InSound, bool InIsCrossFade, float InCrossFadeDuration)
+void ABGMActor::PlayBGM(USoundWave* InSound, bool InIsCrossFade, float InCrossFadeDuration)
 {
 	InSound->bLooping = true;
-	if (m_AudioComponentMap.Contains(InBGMType) == false)
+	// NOTE(JJO): For cross fade (swap)
+	for (int i = 0; i < 2; ++i)
 	{
-		TArray<TWeakObjectPtr<UAudioComponent>> ComponentArray;
-		// NOTE(JJO): For cross fade (swap)
-		for (int i = 0; i < 2; ++i)
-		{
-			UAudioComponent* AudioComponent = UGameplayStatics::CreateSound2D(GetWorld(), InSound, 1.0f, 1.0f, 0.0f, m_pSoundConcurrency.Get(), false, false);
-			AudioComponent->AddToRoot();
-			ComponentArray.Add(AudioComponent);
-		}
-		m_AudioComponentMap.Add(InBGMType, ComponentArray);
+		UAudioComponent* AudioComponent = UGameplayStatics::CreateSound2D(GetWorld(), InSound, 1.0f, 1.0f, 0.0f, m_pSoundConcurrency.Get(), false, false);
+		AudioComponent->AddToRoot();
+		m_AudioComponentList.Add(AudioComponent);
 	}
 
-	PlayBGM_Internal(InBGMType, InSound, InIsCrossFade, InCrossFadeDuration);
+	PlayBGM_Internal(InSound, InIsCrossFade, InCrossFadeDuration);
 }
 
-void ABGMActor::StopBGM(int InBGMType, bool InIsFadeOut, float InFadeOutDuration)
+void ABGMActor::StopBGM(bool InIsFadeOut, float InFadeOutDuration)
 {
-	if (m_AudioComponentMap.Contains(InBGMType) == false)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Cannot find audio component - %d"), InBGMType);
-		return;
-	}
-
-	StopBGM_Internal(InBGMType, InIsFadeOut, InFadeOutDuration);
+	StopBGM_Internal(InIsFadeOut, InFadeOutDuration);
 }
 
-bool ABGMActor::IsPlaying(int InBGMType)
+bool ABGMActor::IsPlaying()
 {
-	if (m_AudioComponentMap.Contains(InBGMType) == false)
-	{
-		return false;
-	}
-
-	for (auto CompIter = m_AudioComponentMap[InBGMType].CreateIterator(); CompIter; ++CompIter)
+	for (auto CompIter = m_AudioComponentList.CreateIterator(); CompIter; ++CompIter)
 	{
 		TWeakObjectPtr<UAudioComponent> Comp = *CompIter;
 		if (Comp->IsPlaying())
@@ -89,9 +82,21 @@ bool ABGMActor::IsPlaying(int InBGMType)
 	return false;
 }
 
-void ABGMActor::PlayBGM_Internal(int InBGMType, USoundWave* InSound, bool InIsCrossFade /*= false*/, float InCrossFadeDuration /*= 1.0f*/)
+void ABGMActor::SetVolume(float InVolume, bool InIsTweening /*= false*/, float InDuration)
 {
-	for (auto CompIter = m_AudioComponentMap[InBGMType].CreateIterator(); CompIter; ++CompIter)
+	m_fTargetVolume = InVolume;
+	m_fOriginVolume = m_AudioComponentList[0]->VolumeMultiplier;
+	m_fCurrentDuration = m_fOriginVolume;
+
+	m_fTargetDuration = InDuration;
+	m_fCurrentDuration = 0.0f;
+
+	m_bIsVolumeTweening = InIsTweening;
+}
+
+void ABGMActor::PlayBGM_Internal(USoundWave* InSound, bool InIsCrossFade /*= false*/, float InCrossFadeDuration /*= 1.0f*/)
+{
+	for (auto CompIter = m_AudioComponentList.CreateIterator(); CompIter; ++CompIter)
 	{
 		TWeakObjectPtr<UAudioComponent> Comp = *CompIter;
 		if (InIsCrossFade)
@@ -113,9 +118,9 @@ void ABGMActor::PlayBGM_Internal(int InBGMType, USoundWave* InSound, bool InIsCr
 	}
 }
 
-void ABGMActor::StopBGM_Internal(int InBGMType, bool InIsFadeOut /*= false*/, float InFadeOutDuration /*= 1.0f*/)
+void ABGMActor::StopBGM_Internal(bool InIsFadeOut /*= false*/, float InFadeOutDuration /*= 1.0f*/)
 {
-	for (auto CompIter = m_AudioComponentMap[InBGMType].CreateIterator(); CompIter; ++CompIter)
+	for (auto CompIter = m_AudioComponentList.CreateIterator(); CompIter; ++CompIter)
 	{
 		TWeakObjectPtr<UAudioComponent> Comp = *CompIter;
 		if (InIsFadeOut)
