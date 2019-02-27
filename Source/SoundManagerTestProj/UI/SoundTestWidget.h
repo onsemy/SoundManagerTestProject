@@ -33,6 +33,10 @@ public:
 	UFUNCTION()
 	void OnClickStopBGMType2();
 	UFUNCTION()
+	void OnClickStopBGMType1FadeOut();
+	UFUNCTION()
+	void OnClickStopBGMType2FadeOut();
+	UFUNCTION()
 	void OnClickPlayBGMType1FadeIn();
 	UFUNCTION()
 	void OnClickPlayBGMType2FadeIn();
@@ -58,6 +62,12 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
 	UButton* btnStopBGMType2 = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
+	UButton* btnStopBGMType1FadeOut = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
+	UButton* btnStopBGMType2FadeOut = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
 	UButton* btnPlayBGMType1FadeIn = nullptr;

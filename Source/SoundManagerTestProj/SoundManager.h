@@ -12,7 +12,7 @@
  */
 class SOUNDMANAGERTESTPROJ_API SoundManager : public TSingleton<SoundManager>
 {
-	TArray<TWeakObjectPtr<ABGMActor>> m_pBGMActorList;
+	TWeakObjectPtr<ABGMActor> m_pBGMActor;
 	TWeakObjectPtr<USoundConcurrency> m_pBGMConcurrency;
 	TWeakObjectPtr<USoundConcurrency> m_pEffectConcurrency;
 	TMap<FString, USoundWave*> m_SoundMap;
@@ -30,8 +30,8 @@ public:
 	bool Load(const FString& InPath);
 	void UnloadAll();
 	void PlayEffect(const FString& InPath);
-	void PlayBGM(const FString& InPath, bool InIsFadeIn = false, float InFadeInDuration = 1.0f, float InFadeVolumeLevel = 1.0f);
-	void StopBGM(bool InIsFadeOut = false, float InFadeOutDuration = 1.0f, float InFadeVolumeLevel = 1.0f);
+	void PlayBGM(int InBGMType, const FString& InPath, bool InIsFadeIn = false, float InFadeInDuration = 1.0f);
+	void StopBGM(int InBGMType, bool InIsFadeOut = false, float InFadeOutDuration = 1.0f);
 
 	void SetBGMConcurrency(USoundConcurrency* InConcurrency) { m_pBGMConcurrency = InConcurrency; }
 	void SetEffectConcurrency(USoundConcurrency* InConcurrency) { m_pEffectConcurrency = InConcurrency; }

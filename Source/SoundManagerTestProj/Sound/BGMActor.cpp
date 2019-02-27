@@ -2,48 +2,133 @@
 
 #include "BGMActor.h"
 #include "Components/AudioComponent.h"
+#include "Kismet/GameplayStatics.h"
 
-
-// Sets default values
 ABGMActor::ABGMActor()
 {
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void ABGMActor::SetConcurrency(USoundConcurrency* InConcurrency)
 {
-	GetAudioComponent()->ConcurrencySettings = InConcurrency;
+	m_pSoundConcurrency = InConcurrency;
 }
 
-// Called when the game starts or when spawned
-void ABGMActor::BeginPlay()
+void ABGMActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	Super::BeginPlay();
-	
+	for (auto MapIter = m_AudioComponentMap.CreateIterator(); MapIter; ++MapIter)
+	{
+		for (auto CompIter = MapIter.Value().CreateIterator(); CompIter; ++CompIter)
+		{
+			TWeakObjectPtr<UAudioComponent> Comp = *CompIter;
+			Comp->RemoveFromRoot();
+			Comp = nullptr;
+		}
+		MapIter.Value().Empty();
+	}
+	m_AudioComponentMap.Empty();
+
+	Super::EndPlay(EndPlayReason);
 }
 
-void ABGMActor::PlayBGM(USoundWave* InSound, bool IsFadeIn, float InFadeInDuration, float InFadeVolumeLevel)
+void ABGMActor::Tick(float DeltaSeconds)
+{
+	if (IsVolumeTweening)
+	{
+		// TODO(JJO): tweening volume
+		//
+	}
+}
+
+void ABGMActor::PlayBGM(int InBGMType, USoundWave* InSound, bool InIsCrossFade, float InCrossFadeDuration)
 {
 	InSound->bLooping = true;
-	GetAudioComponent()->SetSound(InSound);
-	
-	if (IsFadeIn)
+	if (m_AudioComponentMap.Contains(InBGMType) == false)
 	{
-		FadeIn(InFadeInDuration, InFadeVolumeLevel);
+		TArray<TWeakObjectPtr<UAudioComponent>> ComponentArray;
+		// NOTE(JJO): For cross fade (swap)
+		for (int i = 0; i < 2; ++i)
+		{
+			UAudioComponent* AudioComponent = UGameplayStatics::CreateSound2D(GetWorld(), InSound, 1.0f, 1.0f, 0.0f, m_pSoundConcurrency.Get(), false, false);
+			AudioComponent->AddToRoot();
+			ComponentArray.Add(AudioComponent);
+		}
+		m_AudioComponentMap.Add(InBGMType, ComponentArray);
 	}
-	else
+
+	PlayBGM_Internal(InBGMType, InSound, InIsCrossFade, InCrossFadeDuration);
+}
+
+void ABGMActor::StopBGM(int InBGMType, bool InIsFadeOut, float InFadeOutDuration)
+{
+	if (m_AudioComponentMap.Contains(InBGMType) == false)
 	{
-		Play();
+		UE_LOG(LogTemp, Error, TEXT("Cannot find audio component - %d"), InBGMType);
+		return;
+	}
+
+	StopBGM_Internal(InBGMType, InIsFadeOut, InFadeOutDuration);
+}
+
+bool ABGMActor::IsPlaying(int InBGMType)
+{
+	if (m_AudioComponentMap.Contains(InBGMType) == false)
+	{
+		return false;
+	}
+
+	for (auto CompIter = m_AudioComponentMap[InBGMType].CreateIterator(); CompIter; ++CompIter)
+	{
+		TWeakObjectPtr<UAudioComponent> Comp = *CompIter;
+		if (Comp->IsPlaying())
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void ABGMActor::PlayBGM_Internal(int InBGMType, USoundWave* InSound, bool InIsCrossFade /*= false*/, float InCrossFadeDuration /*= 1.0f*/)
+{
+	for (auto CompIter = m_AudioComponentMap[InBGMType].CreateIterator(); CompIter; ++CompIter)
+	{
+		TWeakObjectPtr<UAudioComponent> Comp = *CompIter;
+		if (InIsCrossFade)
+		{
+			if (Comp->IsPlaying() == false)
+			{
+				Comp->FadeIn(InCrossFadeDuration);
+			}
+			else
+			{
+				Comp->FadeOut(InCrossFadeDuration, 1.0f);
+			}
+		}
+		else
+		{
+			Comp->Play();
+			break;
+		}
 	}
 }
 
-void ABGMActor::StopBGM(bool InIsFadeOut, float InFadeOutDuration, float InFadeVolumeLevel)
+void ABGMActor::StopBGM_Internal(int InBGMType, bool InIsFadeOut /*= false*/, float InFadeOutDuration /*= 1.0f*/)
 {
-	if (InIsFadeOut)
+	for (auto CompIter = m_AudioComponentMap[InBGMType].CreateIterator(); CompIter; ++CompIter)
 	{
-		FadeOut(InFadeOutDuration, InFadeVolumeLevel);
-	}
-	else
-	{
-		Stop();
+		TWeakObjectPtr<UAudioComponent> Comp = *CompIter;
+		if (InIsFadeOut)
+		{
+			if (Comp->IsPlaying())
+			{
+				Comp->FadeOut(InFadeOutDuration, 1.0f);
+			}
+		}
+		else
+		{
+			Comp->Stop();
+			break;
+		}
 	}
 }
