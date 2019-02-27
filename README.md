@@ -3,18 +3,20 @@ This project is managing sound control with UnrealEngine function in Unreal Engi
 
 ## Features
 
-### 1. Load/Play/Stop (Background Music, Effect)
+### 1. Play/Stop (Background Music, Effect)
 Load `USoundWave` through Reference Path(FString), and Play or stop Audio using that.
 
 ```cpp
+// Fire and forget. (a.k.a Missile)
 SoundManager::GetInstance()->PlayEffect(TEXT("SoundWave'/Engine/EngineSounds/WhiteNoise.WhiteNoise'"));
 ```
 
-If you want to cross fade, use this.
+If you want to play cross fade for BGM, use this.
 
 ```cpp
-SoundManager::GetInstance()->StopBGM(true);
-SoundManager::GetInstance()->PlayEffect(TEXT("SoundWave'/Engine/EngineSounds/WhiteNoise.WhiteNoise'"), true);
+// When playing BGM already
+SoundManager::GetInstance()->PlayBGM(0, TEXT("SoundWave'/Engine/EngineSounds/WhiteNoise.WhiteNoise'"), true);
+SoundManager::GetInstance()->StopBGM(0);
 ```
 
 ### 2. SetConcurrency
@@ -25,22 +27,18 @@ void SoundManager::Initialize(UWorld* InWorld)
 {
 	m_pWorld = InWorld;
 
-	// NOTE(JJO): For example.
-	m_pBGMConcurrency = LoadObject<USoundConcurrency>(nullptr, TEXT("SoundConcurrency'/Game/Sound/NewSoundConcurrency.NewSoundConcurrency'"));
-	m_pEffectConcurrency = LoadObject<USoundConcurrency>(nullptr, TEXT("SoundConcurrency'/Game/Sound/NewSoundConcurrency.NewSoundConcurrency'"));
+	m_pBGMConcurrency = LoadObject<USoundConcurrency>(nullptr, TEXT("SoundConcurrency'/path/to/BGMConcurrency.BGMConcurrency'"));
+	m_pEffectConcurrency = LoadObject<USoundConcurrency>(nullptr, TEXT("SoundConcurrency'/path/to/EffectConcurrency.EffectConcurrency'"));
 
-	for (int i = 0; i < 2; ++i)
-	{
-		ABGMActor* Actor = InWorld->SpawnActor<ABGMActor>();
-		Actor->SetConcurrency(m_pBGMConcurrency.Get());
-		Actor->AddToRoot();
-		m_pBGMActorList.Add(Actor);
-	}
+	m_pBGMActor = InWorld->SpawnActor<ABGMActor>();
+	m_pBGMActor->SetConcurrency(m_pBGMConcurrency.Get());
+	m_pBGMActor->AddToRoot();
 }
 ```
 
 ### 3. Unload/UnloadAll
-You can unload sounds if you need not it.
+You can unload sounds if you need not it. But it is automatically unloaded when destructor called.
 
 ### 4. Preload/SetVolume [WIP]
-If you want to load some sound in advance, call `Preload(FString)`.
+If you want to load some sound in advance, call `Load(FString)`.
+`SetVolume(float, bool, float)` is supported to *tweening*. You just check a second bool parameter.
