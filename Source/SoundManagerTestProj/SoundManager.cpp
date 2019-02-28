@@ -99,3 +99,9 @@ void SoundManager::StopBGM(int InBGMType, bool InIsFadeOut /*= false*/, float In
 {
 	m_BGMActorMap[InBGMType]->StopBGM(InIsFadeOut, InFadeOutDuration);
 }
+
+void SoundManager::SetBGMVolume(int InBGMType, float InVolume, bool InIsTweening, float InDuration)
+{
+	m_BGMActorMap[InBGMType]->SetVolume(InVolume, InIsTweening, InDuration);
+}
+
