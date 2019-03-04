@@ -13,6 +13,8 @@
 class SOUNDMANAGERTESTPROJ_API SoundManager : public TSingleton<SoundManager>
 {
 	TMap<int, TWeakObjectPtr<ABGMActor>> m_BGMActorMap;
+	TWeakObjectPtr<USoundClass> m_pBGMClass;
+	TWeakObjectPtr<USoundClass> m_pEffectClass;
 	TWeakObjectPtr<USoundConcurrency> m_pBGMConcurrency;
 	TWeakObjectPtr<USoundConcurrency> m_pEffectConcurrency;
 	TMap<FString, USoundWave*> m_SoundMap;
@@ -25,7 +27,7 @@ public:
 	SoundManager();
 	~SoundManager();
 
-	void Initialize(UWorld* InWorld);
+	void Initialize(UWorld* InWorld, const FString& InBGMClass, const FString& InEffectClass, const FString& InBGMConcurrency, const FString& InEffectConcurrency, const int InMaxBGMCount);
 
 	bool Load(const FString& InPath);
 	void UnloadAll();
@@ -37,6 +39,9 @@ public:
 	void SetBGMConcurrency(const FString& InPath);
 	void SetEffectConcurrency(USoundConcurrency* InConcurrency) { m_pEffectConcurrency = InConcurrency; }
 	void SetEffectConcurrency(const FString& InPath);
+
 	void SetBGMVolume(int InBGMType, float InVolume, bool InIsTweening = false, float InDuration = 0.0f);
+	void SetEffectVolume(float InVolume, bool InIsTweening = false, float InDuration = 0.0f);
+	void SetMute(bool InIsMute);
 
 };

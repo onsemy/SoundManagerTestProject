@@ -11,7 +11,13 @@ void ASoundManagerTestProjGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SoundManager::GetInstance()->Initialize(GetWorld());
+	SoundManager::GetInstance()->Initialize(
+		GetWorld(),
+		TEXT("SoundClass'/Engine/EngineSounds/Music.Music'"),
+		TEXT("SoundClass'/Engine/EngineSounds/SFX.SFX'"),
+		TEXT("SoundConcurrency'/Game/Sound/BGMConcurrency.BGMConcurrency'"),
+		TEXT("SoundConcurrency'/Game/Sound/NewSoundConcurrency.NewSoundConcurrency'"),
+		2);
 
 	// NOTE(JJO): For test
 	UClass* BPClass = LoadObject<UClass>(GetWorld(), TEXT("WidgetBlueprint'/Game/UI/SoundTestWidget.SoundTestWidget_C'"));

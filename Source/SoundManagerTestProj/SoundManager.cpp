@@ -3,6 +3,7 @@
 #include "SoundManager.h"
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
+#include "AudioDevice.h"
 
 SoundManager::SoundManager()
 {
@@ -26,14 +27,17 @@ SoundManager::~SoundManager()
 	m_pWorld = nullptr;
 }
 
-void SoundManager::Initialize(UWorld* InWorld)
+void SoundManager::Initialize(UWorld* InWorld, const FString& InBGMClass, const FString& InEffectClass, const FString& InBGMConcurrency, const FString& InEffectConcurrency, const int InMaxBGMCount)
 {
 	m_pWorld = InWorld;
 
-	m_pBGMConcurrency = LoadObject<USoundConcurrency>(nullptr, TEXT("SoundConcurrency'/Game/Sound/BGMConcurrency.BGMConcurrency'"));
-	m_pEffectConcurrency = LoadObject<USoundConcurrency>(nullptr, TEXT("SoundConcurrency'/Game/Sound/NewSoundConcurrency.NewSoundConcurrency'"));
+	m_pBGMClass = LoadObject<USoundClass>(nullptr, *InBGMClass);
+	m_pEffectClass = LoadObject<USoundClass>(nullptr, *InEffectClass);
 
-	for (int i = 0; i < 2; ++i)
+	SetBGMConcurrency(InBGMConcurrency);
+	SetEffectConcurrency(InEffectConcurrency);
+
+	for (int i = 0; i < InMaxBGMCount; ++i)
 	{
 		ABGMActor* Actor = InWorld->SpawnActor<ABGMActor>();
 		Actor->SetConcurrency(m_pBGMConcurrency.Get());
@@ -113,5 +117,22 @@ void SoundManager::SetEffectConcurrency(const FString& InPath)
 void SoundManager::SetBGMVolume(int InBGMType, float InVolume, bool InIsTweening, float InDuration)
 {
 	m_BGMActorMap[InBGMType]->SetVolume(InVolume, InIsTweening, InDuration);
+}
+
+void SoundManager::SetEffectVolume(float InVolume, bool InIsTweening /*= false*/, float InDuration /*= 0.0f*/)
+{
+	m_pEffectClass->Properties.Volume = InVolume;
+}
+
+void SoundManager::SetMute(bool InIsMute)
+{
+	if (FAudioDevice* Device = GEngine->GetMainAudioDevice())
+	{
+		Device->SetDeviceMuted(InIsMute);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AudioDevice is not found!"));
+	}
 }
 
