@@ -43,6 +43,8 @@ public:
 
 	void SetBGMVolume(int InBGMType, float InVolume, bool InIsTweening = false, float InDuration = 0.0f);
 	void SetEffectVolume(float InVolume, bool InIsTweening = false, float InDuration = 0.0f);
+	void SetBGMAllVolume(float InVolume);
+	void SetEffectAllVolume(float InVolume);
 	void SetMute(bool InIsMute);
 
 };

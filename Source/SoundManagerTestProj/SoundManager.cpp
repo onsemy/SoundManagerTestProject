@@ -121,9 +121,20 @@ void SoundManager::SetBGMVolume(int InBGMType, float InVolume, bool InIsTweening
 	m_BGMActorMap[InBGMType]->SetVolume(InVolume, InIsTweening, InDuration);
 }
 
-void SoundManager::SetEffectVolume(float InVolume, bool InIsTweening /*= false*/, float InDuration /*= 0.0f*/)
+void SoundManager::SetBGMAllVolume(float InVolume)
 {
-	m_pEffectClass->Properties.Volume = InVolume;
+	if (m_pBGMClass.IsValid())
+	{
+		m_pBGMClass->Properties.Volume = InVolume;
+	}
+}
+
+void SoundManager::SetEffectAllVolume(float InVolume)
+{
+	if (m_pEffectClass.IsValid())
+	{
+		m_pEffectClass->Properties.Volume = InVolume;
+	}
 }
 
 void SoundManager::SetMute(bool InIsMute)
