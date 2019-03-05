@@ -9,6 +9,7 @@ bool USoundTestWidget::Initialize()
 {
 	if (Super::Initialize())
 	{
+		if (btnMute) btnMute->OnClicked.AddDynamic(this, &USoundTestWidget::OnClickMute);
 		if (btnPlayEffect1) btnPlayEffect1->OnClicked.AddDynamic(this, &USoundTestWidget::OnClickPlayEffect1);
 		if (btnPlayEffectType2) btnPlayEffectType2->OnClicked.AddDynamic(this, &USoundTestWidget::OnClickPlayEffectType2);
 		if (btnPlayEffect100) btnPlayEffect100->OnClicked.AddDynamic(this, &USoundTestWidget::OnClickPlayEffect100);
@@ -33,6 +34,13 @@ bool USoundTestWidget::Initialize()
 	}
 
 	return false;
+}
+
+void USoundTestWidget::OnClickMute()
+{
+	SoundManager::GetInstance()->SetMute(m_bIsMute = !m_bIsMute);
+	FString str = m_bIsMute ? TEXT("Mute ON") : TEXT("Mute OFF");
+	txtMute->SetText(FText::FromString(str));
 }
 
 void USoundTestWidget::OnClickPlayEffect1()

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Button.h"
+#include "TextBlock.h"
 #include "SoundTestWidget.generated.h"
 
 /**
@@ -15,9 +16,13 @@ class SOUNDMANAGERTESTPROJ_API USoundTestWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+	bool m_bIsMute;
+
 public:
 	virtual bool Initialize() override;
 
+	UFUNCTION()
+	void OnClickMute();
 	UFUNCTION()
 	void OnClickPlayEffect1();
 	UFUNCTION()
@@ -115,4 +120,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
 	UButton* btnEnvPlayBGMType2FadeIn = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
+	UButton* btnMute = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
+	UTextBlock* txtMute = nullptr;
+	
 };
