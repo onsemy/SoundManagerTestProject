@@ -106,6 +106,15 @@ void SoundManager::StopAllBGM()
 	}
 }
 
+void SoundManager::StopAllEffect()
+{
+	for (auto SFXIter(m_EffectActorList.CreateIterator()); SFXIter; ++SFXIter)
+	{
+		TWeakObjectPtr<AEffectActor> SFX = *SFXIter;
+		SFX->StopEffect();
+	}
+}
+
 void SoundManager::SetBGMConcurrency(const FString& InPath)
 {
 	SetBGMConcurrency(LoadObject<USoundConcurrency>(nullptr, *InPath));

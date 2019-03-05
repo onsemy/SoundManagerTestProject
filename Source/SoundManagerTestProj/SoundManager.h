@@ -35,6 +35,7 @@ public:
 	void PlayBGM(int InBGMType, const FString& InPath, bool InIsFadeIn = false, float InFadeInDuration = 1.0f);
 	void StopBGM(int InBGMType, bool InIsFadeOut = false, float InFadeOutDuration = 1.0f);
 	void StopAllBGM();
+	void StopAllEffect();
 
 	void SetBGMConcurrency(USoundConcurrency* InConcurrency) { m_pBGMConcurrency = InConcurrency; }
 	void SetBGMConcurrency(const FString& InPath);
