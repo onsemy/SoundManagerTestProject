@@ -97,6 +97,15 @@ void SoundManager::StopBGM(int InBGMType, bool InIsFadeOut /*= false*/, float In
 	m_BGMActorMap[InBGMType]->StopBGM(InIsFadeOut, InFadeOutDuration);
 }
 
+void SoundManager::StopAllBGM()
+{
+	for (auto BGMIter(m_BGMActorMap.CreateIterator()); BGMIter; ++BGMIter)
+	{
+		TWeakObjectPtr<ABGMActor> BGM = BGMIter.Value();
+		BGM->StopBGM();
+	}
+}
+
 void SoundManager::SetBGMConcurrency(const FString& InPath)
 {
 	SetBGMConcurrency(LoadObject<USoundConcurrency>(nullptr, *InPath));
