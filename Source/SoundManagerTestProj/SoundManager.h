@@ -6,6 +6,7 @@
 #include "Utils/Singleton.h"
 #include "Sound/AmbientSound.h"
 #include "Sound/BGMActor.h"
+#include "Sound/EffectActor.h"
 
 /**
  * 
@@ -17,7 +18,13 @@ class SOUNDMANAGERTESTPROJ_API SoundManager : public TSingleton<SoundManager>
 	TWeakObjectPtr<USoundClass> m_pEffectClass;
 	TWeakObjectPtr<USoundConcurrency> m_pBGMConcurrency;
 	TWeakObjectPtr<USoundConcurrency> m_pEffectConcurrency;
+
+	int m_nCurrentEffectIndex = 0;
+	int m_nEffectMaxCount = 50;
+	TArray<TWeakObjectPtr<AEffectActor>> m_EffectActorList;
+
 	TMap<FString, USoundWave*> m_SoundMap;
+	TMap<USoundWave*, int> m_SoundReferenceMap;
 
 	TWeakObjectPtr<UWorld> m_pWorld;
 	UWorld* GetWorld() const { return m_pWorld.Get(); }
@@ -48,6 +55,9 @@ public:
 	void SetBGMAllVolume(float InVolume);
 	void SetEffectAllVolume(float InVolume);
 	void SetMute(bool InIsMute);
+
+	int AddReferenceCount(USoundWave* InSound);
+	int RemoveReferenceCount(USoundWave* InSound);
 
 	DECLARE_MULTICAST_DELEGATE_OneParam(FOnMutedDelegate, bool);
 	FOnMutedDelegate OnMutedDelegate;

@@ -4,6 +4,7 @@
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
 #include "AudioDevice.h"
+#include "Sound/EffectActor.h"
 
 SoundManager::SoundManager()
 {
@@ -15,6 +16,8 @@ SoundManager::~SoundManager()
 	UnloadAll();
 
 	m_BGMActorMap.Empty();
+
+	m_EffectActorList.Empty();
 
 	m_pBGMConcurrency = nullptr;
 	m_pEffectConcurrency = nullptr;
@@ -38,6 +41,16 @@ void SoundManager::Initialize(UWorld* InWorld, const FString& InBGMClass, const 
 
 		m_BGMActorMap.Add(i, Actor);
 	}
+
+	m_nEffectMaxCount = m_pEffectConcurrency.IsValid() ? m_pEffectConcurrency->Concurrency.MaxCount : 50;
+	for (int i = 0; i < m_nEffectMaxCount; ++i)
+	{
+		AEffectActor* Actor = InWorld->SpawnActor<AEffectActor>();
+
+		m_EffectActorList.Add(Actor);
+	}
+
+	m_nCurrentEffectIndex = 0;
 }
 
 bool SoundManager::Load(const FString& InPath)
@@ -90,7 +103,8 @@ void SoundManager::PlayEffect(const FString& InPath)
 	}
 
 	m_SoundMap[InPath]->bLooping = false;
-	UGameplayStatics::PlaySound2D(GetWorld(), m_SoundMap[InPath], 1.0f, 1.0f, 0.0f, m_pEffectConcurrency.Get());
+	m_EffectActorList[m_nCurrentEffectIndex]->PlayEffect(m_SoundMap[InPath]);
+	m_nCurrentEffectIndex = (m_nCurrentEffectIndex + 1) % m_nEffectMaxCount;
 }
 
 void SoundManager::PlayBGM(int InBGMType, const FString& InPath, bool InIsFadeIn, float InFadeInDuration)
@@ -187,5 +201,46 @@ void SoundManager::SetMute(bool InIsMute)
 	}
 
 	OnMutedDelegate.Broadcast(m_bIsMute);
+}
+
+int SoundManager::AddReferenceCount(USoundWave* InSound)
+{
+	if (m_SoundReferenceMap.Contains(InSound) == false)
+	{
+		m_SoundReferenceMap.Add(InSound, 0);
+	}
+
+	m_SoundReferenceMap[InSound]++;
+
+	UE_LOG(LogTemp, Log, TEXT("%s ref count: %d"), *InSound->GetName(), m_SoundReferenceMap[InSound]);
+
+	return m_SoundReferenceMap[InSound];
+}
+
+int SoundManager::RemoveReferenceCount(USoundWave* InSound)
+{
+	if (m_SoundReferenceMap.Contains(InSound) == false)
+	{
+		return 0;
+	}
+
+	m_SoundReferenceMap[InSound]--;
+	UE_LOG(LogTemp, Log, TEXT("%s ref count: %d"), *InSound->GetName(), m_SoundReferenceMap[InSound]);
+	if (m_SoundReferenceMap[InSound] == 0)
+	{
+		m_SoundReferenceMap.Remove(InSound);
+		for (auto SoundIter(m_SoundMap.CreateIterator()); SoundIter; ++SoundIter)
+		{
+			USoundWave* Sound = SoundIter.Value();
+			if (Sound == InSound)
+			{
+				m_SoundMap.Remove(SoundIter.Key());
+
+				return 0;
+			}
+		}
+	}
+
+	return m_SoundReferenceMap[InSound];
 }
 
