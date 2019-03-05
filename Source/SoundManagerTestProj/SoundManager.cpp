@@ -71,6 +71,18 @@ void SoundManager::UnloadAll()
 
 void SoundManager::PlayEffect(const FString& InPath)
 {
+	//if (FAudioDevice* Device = GEngine->GetActiveAudioDevice())
+	//{
+	//	if (Device->IsAudioDeviceMuted())
+	//	{
+	//		return;
+	//	}
+	//}
+	if (m_bIsMute)
+	{
+		return;
+	}
+
 	if (Load(InPath) == false)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Failed to PlayEffect - %s is invalid"), *InPath);
@@ -83,6 +95,18 @@ void SoundManager::PlayEffect(const FString& InPath)
 
 void SoundManager::PlayBGM(int InBGMType, const FString& InPath, bool InIsFadeIn, float InFadeInDuration)
 {
+	//if (FAudioDevice* Device = GEngine->GetActiveAudioDevice())
+	//{
+	//	if (Device->IsAudioDeviceMuted())
+	//	{
+	//		return;
+	//	}
+	//}
+	if (m_bIsMute)
+	{
+		return;
+	}
+
 	if (Load(InPath) == false)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Failed to PlayBGM - %s is invalid"), *InPath);
@@ -148,13 +172,20 @@ void SoundManager::SetEffectAllVolume(float InVolume)
 
 void SoundManager::SetMute(bool InIsMute)
 {
-	if (FAudioDevice* Device = GEngine->GetMainAudioDevice())
+	m_bIsMute = InIsMute;
+	if (FAudioDevice* Device = GEngine->GetActiveAudioDevice())
 	{
 		Device->SetDeviceMuted(InIsMute);
+		StopAllEffect();
+		StopAllBGM();
+
+		UnloadAll();
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("AudioDevice is not found!"));
 	}
+
+	OnMutedDelegate.Broadcast(m_bIsMute);
 }
 

@@ -23,6 +23,8 @@ class SOUNDMANAGERTESTPROJ_API SoundManager : public TSingleton<SoundManager>
 	UWorld* GetWorld() const { return m_pWorld.Get(); }
 	int m_nCurrentBGMIndex;
 
+	bool m_bIsMute;
+
 public:
 	SoundManager();
 	~SoundManager();
@@ -46,5 +48,8 @@ public:
 	void SetBGMAllVolume(float InVolume);
 	void SetEffectAllVolume(float InVolume);
 	void SetMute(bool InIsMute);
+
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnMutedDelegate, bool);
+	FOnMutedDelegate OnMutedDelegate;
 
 };
