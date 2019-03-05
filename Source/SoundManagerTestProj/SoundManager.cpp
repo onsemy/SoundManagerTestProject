@@ -14,12 +14,6 @@ SoundManager::~SoundManager()
 {
 	UnloadAll();
 
-	for (auto ActorIter = m_BGMActorMap.CreateIterator(); ActorIter; ++ActorIter)
-	{
-		TWeakObjectPtr<ABGMActor> Actor = ActorIter.Value();
-		Actor->RemoveFromRoot();
-		Actor = nullptr;
-	}
 	m_BGMActorMap.Empty();
 
 	m_pBGMConcurrency = nullptr;
@@ -41,7 +35,6 @@ void SoundManager::Initialize(UWorld* InWorld, const FString& InBGMClass, const 
 	{
 		ABGMActor* Actor = InWorld->SpawnActor<ABGMActor>();
 		Actor->SetConcurrency(m_pBGMConcurrency.Get());
-		Actor->AddToRoot();
 
 		m_BGMActorMap.Add(i, Actor);
 	}
