@@ -88,11 +88,24 @@ bool ABGMActor::IsPlaying()
 void ABGMActor::SetVolume(float InVolume, bool InIsTweening /*= false*/, float InDuration)
 {
 	m_fTargetVolume = InVolume;
-	m_fOriginVolume = m_AudioComponentList[0]->VolumeMultiplier;
-	m_fCurrentDuration = m_fOriginVolume;
 
-	m_fTargetDuration = InDuration;
-	m_fCurrentDuration = 0.0f;
+	if (InIsTweening)
+	{
+		m_fOriginVolume = m_AudioComponentList[0]->VolumeMultiplier;
+
+		m_fTargetDuration = InDuration;
+		m_fCurrentDuration = 0.0f;
+	}
+	else
+	{
+		m_fOriginVolume = InVolume;
+
+		m_fTargetDuration = InDuration;
+		m_fCurrentDuration = InDuration;
+
+		m_AudioComponentList[0]->VolumeMultiplier = InVolume;
+		m_AudioComponentList[1]->VolumeMultiplier = InVolume;
+	}
 
 	m_bIsVolumeTweening = InIsTweening;
 }
