@@ -212,7 +212,7 @@ int SoundManager::AddReferenceCount(USoundWave* InSound)
 
 	m_SoundReferenceMap[InSound]++;
 
-	UE_LOG(LogTemp, Log, TEXT("%s ref count: %d"), *InSound->GetName(), m_SoundReferenceMap[InSound]);
+	UE_LOG(LogTemp, Log, TEXT("%s added ref count: %d"), *InSound->GetName(), m_SoundReferenceMap[InSound]);
 
 	return m_SoundReferenceMap[InSound];
 }
@@ -225,7 +225,7 @@ int SoundManager::RemoveReferenceCount(USoundWave* InSound)
 	}
 
 	m_SoundReferenceMap[InSound]--;
-	UE_LOG(LogTemp, Log, TEXT("%s ref count: %d"), *InSound->GetName(), m_SoundReferenceMap[InSound]);
+	UE_LOG(LogTemp, Log, TEXT("%s removed ref count: %d"), *InSound->GetName(), m_SoundReferenceMap[InSound]);
 	if (m_SoundReferenceMap[InSound] == 0)
 	{
 		m_SoundReferenceMap.Remove(InSound);
