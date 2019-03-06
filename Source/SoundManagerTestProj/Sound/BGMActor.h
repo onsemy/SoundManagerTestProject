@@ -39,9 +39,12 @@ public:
 	bool IsPlaying();
 
 	void SetVolume(float InVolume, bool InIsTweening = false, float InDuration = 0.0f);
+	FString GetSoundPath() const { return m_pCurrentSound->GetPathName(); }
 
 private:
 	void PlayBGM_Internal(USoundWave* InSound, bool InIsCrossFade = false, float InCrossFadeDuration = 1.0f);
 	void StopBGM_Internal(bool InIsFadeOut = false, float InFadeOutDuration = 1.0f);
+
+	TWeakObjectPtr<USoundWave> m_pCurrentSound;
 
 };

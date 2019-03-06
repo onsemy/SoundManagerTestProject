@@ -139,6 +139,8 @@ void ABGMActor::PlayBGM_Internal(USoundWave* InSound, bool InIsCrossFade /*= fal
 			}
 		}
 	}
+
+	m_pCurrentSound = InSound;
 }
 
 void ABGMActor::StopBGM_Internal(bool InIsFadeOut /*= false*/, float InFadeOutDuration /*= 1.0f*/)
@@ -158,4 +160,6 @@ void ABGMActor::StopBGM_Internal(bool InIsFadeOut /*= false*/, float InFadeOutDu
 			Comp->Stop();
 		}
 	}
+
+	m_pCurrentSound = nullptr;
 }
