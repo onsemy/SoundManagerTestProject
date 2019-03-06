@@ -254,6 +254,7 @@ int SoundManager::RemoveReferenceCount(USoundWave* InSound)
 			USoundWave* Sound = SoundIter.Value();
 			if (Sound == InSound)
 			{
+				Sound->RemoveFromRoot();
 				m_SoundMap.Remove(SoundIter.Key());
 
 				return 0;
