@@ -20,7 +20,7 @@ class SOUNDMANAGERTESTPROJ_API SoundManager : public TSingleton<SoundManager>
 	TWeakObjectPtr<USoundConcurrency> m_pEffectConcurrency;
 
 	int m_nCurrentEffectIndex = 0;
-	int m_nEffectMaxCount = 50;
+	int m_nEffectMaxCount = 10;
 	TArray<TWeakObjectPtr<AEffectActor>> m_EffectActorList;
 
 	TMap<FString, USoundWave*> m_SoundMap;
@@ -30,7 +30,7 @@ class SOUNDMANAGERTESTPROJ_API SoundManager : public TSingleton<SoundManager>
 	UWorld* GetWorld() const { return m_pWorld.Get(); }
 	int m_nCurrentBGMIndex;
 
-	bool m_bIsMute;
+	bool m_bIsMute = false;
 
 public:
 	SoundManager();
