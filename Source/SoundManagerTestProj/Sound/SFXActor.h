@@ -19,7 +19,7 @@ public:
 	// Sets default values for this actor's properties
 	ASFXActor();
 
-	void PlayEffect(USoundWave* InSound);
+	void PlayEffect(USoundWave* InSound, float InVolume = 1.0f);
 	void StopEffect();
 
 	void SetConcurrency(USoundConcurrency* InSoundConcurrency) { m_pSoundConcurrency = InSoundConcurrency; }

@@ -18,7 +18,7 @@ ASFXActor::ASFXActor()
 	m_pAudioComponent->OnAudioFinished.AddDynamic(this, &ASFXActor::OnAudioFinished);
 }
 
-void ASFXActor::PlayEffect(USoundWave* InSound)
+void ASFXActor::PlayEffect(USoundWave* InSound, float InVolume)
 {
 	if (m_pAudioComponent->IsPlaying())
 	{
@@ -32,6 +32,7 @@ void ASFXActor::PlayEffect(USoundWave* InSound)
 
 	m_pAudioComponent->ConcurrencySettings = m_pSoundConcurrency.Get();
 	m_pAudioComponent->SetSound(m_pSoundWave.Get());
+	m_pAudioComponent->VolumeMultiplier = InVolume;
 
 	if (m_pAudioComponent->IsPlaying() == false)
 	{
