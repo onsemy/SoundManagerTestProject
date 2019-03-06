@@ -139,8 +139,7 @@ void SoundManager::StopAllBGM()
 {
 	for (auto BGMIter(m_BGMActorMap.CreateIterator()); BGMIter; ++BGMIter)
 	{
-		TWeakObjectPtr<ABGMActor> BGM = BGMIter.Value();
-		BGM->StopBGM();
+		StopBGM(BGMIter.Key());
 	}
 }
 
