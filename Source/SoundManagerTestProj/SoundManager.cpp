@@ -117,6 +117,7 @@ void SoundManager::PlayBGM(int InBGMType, const FString& InPath, bool InIsFadeIn
 	//}
 	if (m_bIsMute)
 	{
+		SaveLatestBGMPath(InBGMType);
 		return;
 	}
 
@@ -136,14 +137,7 @@ void SoundManager::PlayBGM(int InBGMType, const FString& InPath, bool InIsFadeIn
 
 void SoundManager::StopBGM(int InBGMType, bool InIsFadeOut /*= false*/, float InFadeOutDuration /*= 1.0f*/)
 {
-	if (m_LatestBGMPathMap.Contains(InBGMType))
-	{
-		m_LatestBGMPathMap[InBGMType] = m_BGMActorMap[InBGMType]->GetSoundPath();
-	}
-	else
-	{
-		m_LatestBGMPathMap.Add(InBGMType, m_BGMActorMap[InBGMType]->GetSoundPath());
-	}
+	SaveLatestBGMPath(InBGMType);
 
 	m_BGMActorMap[InBGMType]->StopBGM(InIsFadeOut, InFadeOutDuration);
 }
@@ -162,6 +156,18 @@ void SoundManager::StopAllEffect()
 	{
 		TWeakObjectPtr<ASFXActor> SFX = *SFXIter;
 		SFX->StopEffect();
+	}
+}
+
+void SoundManager::SaveLatestBGMPath(int InBGMType)
+{
+	if (m_LatestBGMPathMap.Contains(InBGMType))
+	{
+		m_LatestBGMPathMap[InBGMType] = m_BGMActorMap[InBGMType]->GetSoundPath();
+	}
+	else
+	{
+		m_LatestBGMPathMap.Add(InBGMType, m_BGMActorMap[InBGMType]->GetSoundPath());
 	}
 }
 
