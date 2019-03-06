@@ -144,6 +144,10 @@ void ABGMActor::PlayBGM_Internal(USoundWave* InSound, bool InIsCrossFade /*= fal
 			{
 				Comp->SetSound(InSound);
 				Comp->Play();
+
+				// NOTE(JJO): Default play is set to default volume
+				SetVolume(1.0f);
+
 				IsAlreadyFadeIn = true;
 			}
 			else
