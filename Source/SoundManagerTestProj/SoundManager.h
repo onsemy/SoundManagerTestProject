@@ -26,6 +26,8 @@ class SOUNDMANAGERTESTPROJ_API SoundManager : public TSingleton<SoundManager>
 	TMap<FString, USoundWave*> m_SoundMap;
 	TMap<USoundWave*, int> m_SoundReferenceMap;
 
+	TMap<int, FString> m_LatestBGMPathMap;
+
 	TWeakObjectPtr<UWorld> m_pWorld;
 	UWorld* GetWorld() const { return m_pWorld.Get(); }
 	int m_nCurrentBGMIndex;
@@ -58,8 +60,5 @@ public:
 
 	int AddReferenceCount(USoundWave* InSound);
 	int RemoveReferenceCount(USoundWave* InSound);
-
-	DECLARE_MULTICAST_DELEGATE_OneParam(FOnMutedDelegate, bool);
-	FOnMutedDelegate OnMutedDelegate;
 
 };

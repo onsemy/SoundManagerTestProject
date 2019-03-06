@@ -42,7 +42,7 @@ void SoundManager::Initialize(UWorld* InWorld, const FString& InBGMClass, const 
 		m_BGMActorMap.Add(i, Actor);
 	}
 
-	m_nEffectMaxCount = m_pEffectConcurrency.IsValid() ? m_pEffectConcurrency->Concurrency.MaxCount : 50;
+	m_nEffectMaxCount = m_pEffectConcurrency.IsValid() ? m_pEffectConcurrency->Concurrency.MaxCount : 10;
 	for (int i = 0; i < m_nEffectMaxCount; ++i)
 	{
 		AEffectActor* Actor = InWorld->SpawnActor<AEffectActor>();
@@ -128,10 +128,24 @@ void SoundManager::PlayBGM(int InBGMType, const FString& InPath, bool InIsFadeIn
 	}
 
 	m_BGMActorMap[InBGMType]->PlayBGM(m_SoundMap[InPath], InIsFadeIn, InFadeInDuration);
+
+	if (m_LatestBGMPathMap.Contains(InBGMType))
+	{
+		m_LatestBGMPathMap.Remove(InBGMType);
+	}
 }
 
 void SoundManager::StopBGM(int InBGMType, bool InIsFadeOut /*= false*/, float InFadeOutDuration /*= 1.0f*/)
 {
+	if (m_LatestBGMPathMap.Contains(InBGMType))
+	{
+		m_LatestBGMPathMap[InBGMType] = m_BGMActorMap[InBGMType]->GetSoundPath();
+	}
+	else
+	{
+		m_LatestBGMPathMap.Add(InBGMType, m_BGMActorMap[InBGMType]->GetSoundPath());
+	}
+
 	m_BGMActorMap[InBGMType]->StopBGM(InIsFadeOut, InFadeOutDuration);
 }
 
@@ -189,17 +203,25 @@ void SoundManager::SetMute(bool InIsMute)
 	if (FAudioDevice* Device = GEngine->GetActiveAudioDevice())
 	{
 		Device->SetDeviceMuted(InIsMute);
-		StopAllEffect();
-		StopAllBGM();
+		if (m_bIsMute)
+		{
+			StopAllEffect();
+			StopAllBGM();
 
-		UnloadAll();
+			UnloadAll();
+		}
+		else
+		{
+			for (auto PathIter(m_LatestBGMPathMap.CreateIterator()); PathIter; ++PathIter)
+			{
+				PlayBGM(PathIter.Key(), PathIter.Value());
+			}
+		}
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("AudioDevice is not found!"));
 	}
-
-	OnMutedDelegate.Broadcast(m_bIsMute);
 }
 
 int SoundManager::AddReferenceCount(USoundWave* InSound)
