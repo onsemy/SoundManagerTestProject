@@ -4,7 +4,6 @@
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
 #include "AudioDevice.h"
-#include "Sound/EffectActor.h"
 
 SoundManager::SoundManager()
 {
@@ -45,7 +44,7 @@ void SoundManager::Initialize(UWorld* InWorld, const FString& InBGMClass, const 
 	m_nEffectMaxCount = m_pEffectConcurrency.IsValid() ? m_pEffectConcurrency->Concurrency.MaxCount : 10;
 	for (int i = 0; i < m_nEffectMaxCount; ++i)
 	{
-		AEffectActor* Actor = InWorld->SpawnActor<AEffectActor>();
+		ASFXActor* Actor = InWorld->SpawnActor<ASFXActor>();
 
 		m_EffectActorList.Add(Actor);
 	}
@@ -161,7 +160,7 @@ void SoundManager::StopAllEffect()
 {
 	for (auto SFXIter(m_EffectActorList.CreateIterator()); SFXIter; ++SFXIter)
 	{
-		TWeakObjectPtr<AEffectActor> SFX = *SFXIter;
+		TWeakObjectPtr<ASFXActor> SFX = *SFXIter;
 		SFX->StopEffect();
 	}
 }

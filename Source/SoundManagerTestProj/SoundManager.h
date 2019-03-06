@@ -6,7 +6,7 @@
 #include "Utils/Singleton.h"
 #include "Sound/AmbientSound.h"
 #include "Sound/BGMActor.h"
-#include "Sound/EffectActor.h"
+#include "Sound/SFXActor.h"
 
 /**
  * 
@@ -21,7 +21,7 @@ class SOUNDMANAGERTESTPROJ_API SoundManager : public TSingleton<SoundManager>
 
 	int m_nCurrentEffectIndex = 0;
 	int m_nEffectMaxCount = 10;
-	TArray<TWeakObjectPtr<AEffectActor>> m_EffectActorList;
+	TArray<TWeakObjectPtr<ASFXActor>> m_EffectActorList;
 
 	TMap<FString, USoundWave*> m_SoundMap;
 	TMap<USoundWave*, int> m_SoundReferenceMap;
