@@ -24,6 +24,8 @@ public:
 	UFUNCTION()
 	void OnClickMute();
 	UFUNCTION()
+	void OnClickStopAll();
+	UFUNCTION()
 	void OnClickPlayEffect1();
 	UFUNCTION()
 	void OnClickPlayEffectType2();
@@ -125,5 +127,8 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
 	UTextBlock* txtMute = nullptr;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", BindWidget))
+	UButton* btnStopAll = nullptr;
+
 };
