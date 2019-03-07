@@ -169,11 +169,13 @@ void ABGMActor::StopBGM_Internal(bool InIsFadeOut /*= false*/, float InFadeOutDu
 		{
 			if (Comp->IsPlaying())
 			{
+				AudioFinishedDelegate.Broadcast(Cast<USoundWave>(Comp->Sound));
 				Comp->FadeOut(InFadeOutDuration, 0.0f);
 			}
 		}
 		else
 		{
+			AudioFinishedDelegate.Broadcast(Cast<USoundWave>(Comp->Sound));
 			Comp->Stop();
 		}
 	}

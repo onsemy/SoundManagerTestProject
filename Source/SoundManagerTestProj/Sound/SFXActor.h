@@ -26,5 +26,8 @@ public:
 
 	UFUNCTION()
 	void OnAudioFinished();
-	
+
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnAudioFinishedDelegate, USoundWave*);
+	FOnAudioFinishedDelegate AudioFinishedDelegate;
+
 };

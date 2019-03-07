@@ -59,7 +59,8 @@ public:
 	void SetEffectAllVolume(float InVolume);
 	void SetMute(bool InIsMute);
 
-	int AddReferenceCount(USoundWave* InSound);
-	int RemoveReferenceCount(USoundWave* InSound);
+private:
+	void AddReferenceCount(USoundWave* InSound);
+	void RemoveReferenceCount(USoundWave* InSound);
 
 };

@@ -23,12 +23,11 @@ void ASFXActor::PlayEffect(USoundWave* InSound, float InVolume)
 	if (m_pAudioComponent->IsPlaying())
 	{
 		// NOTE(JJO): remove reference count of previous version
-		SoundManager::GetInstance()->RemoveReferenceCount(m_pSoundWave.Get());
+		AudioFinishedDelegate.Broadcast(m_pSoundWave.Get());
 	}
 
 	m_pSoundWave = InSound;
 
-	SoundManager::GetInstance()->AddReferenceCount(m_pSoundWave.Get());
 
 	m_pAudioComponent->ConcurrencySettings = m_pSoundConcurrency.Get();
 	m_pAudioComponent->SetSound(m_pSoundWave.Get());
@@ -54,7 +53,7 @@ void ASFXActor::StopEffect()
 
 void ASFXActor::OnAudioFinished()
 {
-	SoundManager::GetInstance()->RemoveReferenceCount(m_pSoundWave.Get());
+	AudioFinishedDelegate.Broadcast(m_pSoundWave.Get());
 
 	m_pAudioComponent->SetSound(nullptr);
 	m_pSoundWave = nullptr;

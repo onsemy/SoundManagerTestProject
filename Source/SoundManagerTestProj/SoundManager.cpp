@@ -37,6 +37,7 @@ void SoundManager::Initialize(UWorld* InWorld, const FString& InBGMClass, const 
 	{
 		ABGMActor* Actor = InWorld->SpawnActor<ABGMActor>();
 		Actor->SetConcurrency(m_pBGMConcurrency.Get());
+		Actor->AudioFinishedDelegate.AddRaw(this, &SoundManager::RemoveReferenceCount);
 
 		m_BGMActorMap.Add(i, Actor);
 	}
@@ -45,6 +46,7 @@ void SoundManager::Initialize(UWorld* InWorld, const FString& InBGMClass, const 
 	for (int i = 0; i < m_nEffectMaxCount; ++i)
 	{
 		ASFXActor* Actor = InWorld->SpawnActor<ASFXActor>();
+		Actor->AudioFinishedDelegate.AddRaw(this, &SoundManager::RemoveReferenceCount);
 
 		m_EffectActorList.Add(Actor);
 	}
@@ -102,6 +104,7 @@ void SoundManager::PlayEffect(const FString& InPath)
 	}
 
 	m_SoundMap[InPath]->bLooping = false;
+	AddReferenceCount(m_SoundMap[InPath]);
 	m_EffectActorList[m_nCurrentEffectIndex]->PlayEffect(m_SoundMap[InPath]);
 	m_nCurrentEffectIndex = (m_nCurrentEffectIndex + 1) % m_nEffectMaxCount;
 }
@@ -127,6 +130,7 @@ void SoundManager::PlayBGM(int InBGMType, const FString& InPath, bool InIsFadeIn
 		return;
 	}
 
+	AddReferenceCount(m_SoundMap[InPath]);
 	m_BGMActorMap[InBGMType]->PlayBGM(m_SoundMap[InPath], InIsFadeIn, InFadeInDuration);
 
 	if (m_LatestBGMPathMap.Contains(InBGMType))
@@ -229,7 +233,7 @@ void SoundManager::SetMute(bool InIsMute)
 	}
 }
 
-int SoundManager::AddReferenceCount(USoundWave* InSound)
+void SoundManager::AddReferenceCount(USoundWave* InSound)
 {
 	if (m_SoundReferenceMap.Contains(InSound) == false)
 	{
@@ -240,14 +244,13 @@ int SoundManager::AddReferenceCount(USoundWave* InSound)
 
 	UE_LOG(LogTemp, Log, TEXT("%s added ref count: %d"), *InSound->GetName(), m_SoundReferenceMap[InSound]);
 
-	return m_SoundReferenceMap[InSound];
 }
 
-int SoundManager::RemoveReferenceCount(USoundWave* InSound)
+void SoundManager::RemoveReferenceCount(USoundWave* InSound)
 {
 	if (m_SoundReferenceMap.Contains(InSound) == false)
 	{
-		return 0;
+		return;
 	}
 
 	m_SoundReferenceMap[InSound]--;
@@ -263,11 +266,10 @@ int SoundManager::RemoveReferenceCount(USoundWave* InSound)
 				Sound->RemoveFromRoot();
 				m_SoundMap.Remove(SoundIter.Key());
 
-				return 0;
+				return;
 			}
 		}
 	}
 
-	return m_SoundReferenceMap[InSound];
 }
 

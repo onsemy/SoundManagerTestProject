@@ -27,6 +27,9 @@ class SOUNDMANAGERTESTPROJ_API ABGMActor : public AActor
 public:	
 	ABGMActor();
 
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnAudioFinishedDelegate, USoundWave*);
+	FOnAudioFinishedDelegate AudioFinishedDelegate;
+
 	void SetConcurrency(USoundConcurrency* InConcurrency);
 
 protected:
