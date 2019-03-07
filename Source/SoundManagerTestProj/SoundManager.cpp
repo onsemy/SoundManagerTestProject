@@ -146,11 +146,11 @@ void SoundManager::StopBGM(int InBGMType, bool InIsFadeOut /*= false*/, float In
 	m_BGMActorMap[InBGMType]->StopBGM(InIsFadeOut, InFadeOutDuration);
 }
 
-void SoundManager::StopAllBGM()
+void SoundManager::StopAllBGM(bool InIsFadeOut, float InFadeOutDuration)
 {
 	for (auto BGMIter(m_BGMActorMap.CreateIterator()); BGMIter; ++BGMIter)
 	{
-		StopBGM(BGMIter.Key());
+		StopBGM(BGMIter.Key(), InIsFadeOut, InFadeOutDuration);
 	}
 }
 

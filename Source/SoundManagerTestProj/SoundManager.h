@@ -45,7 +45,7 @@ public:
 	void PlayEffect(const FString& InPath);
 	void PlayBGM(int InBGMType, const FString& InPath, bool InIsFadeIn = false, float InFadeInDuration = 1.0f);
 	void StopBGM(int InBGMType, bool InIsFadeOut = false, float InFadeOutDuration = 1.0f);
-	void StopAllBGM();
+	void StopAllBGM(bool InIsFadeOut = false, float InFadeOutDuration = 1.0f);
 	void StopAllEffect();
 	void SaveLatestBGMPath(int InBGMType);
 
