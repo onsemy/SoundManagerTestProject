@@ -28,7 +28,6 @@ void ASFXActor::PlayEffect(USoundWave* InSound, float InVolume)
 
 	m_pSoundWave = InSound;
 
-
 	m_pAudioComponent->ConcurrencySettings = m_pSoundConcurrency.Get();
 	m_pAudioComponent->SetSound(m_pSoundWave.Get());
 	m_pAudioComponent->VolumeMultiplier = InVolume;
