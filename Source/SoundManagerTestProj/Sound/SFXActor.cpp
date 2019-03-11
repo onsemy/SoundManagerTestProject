@@ -9,7 +9,7 @@
 // Sets default values
 ASFXActor::ASFXActor()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	m_pAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
@@ -57,4 +57,3 @@ void ASFXActor::OnAudioFinished()
 	m_pAudioComponent->SetSound(nullptr);
 	m_pSoundWave = nullptr;
 }
-

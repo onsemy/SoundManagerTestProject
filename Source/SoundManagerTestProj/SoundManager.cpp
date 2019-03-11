@@ -16,7 +16,7 @@ SoundManager::~SoundManager()
 
 	m_BGMActorMap.Empty();
 
-	m_EffectActorList.Empty();
+	m_EffectActorMap.Empty();
 
 	m_pBGMConcurrency = nullptr;
 	m_pEffectConcurrency = nullptr;
@@ -33,25 +33,54 @@ void SoundManager::Initialize(UWorld* InWorld, const FString& InBGMClass, const 
 	SetBGMConcurrency(InBGMConcurrency);
 	SetEffectConcurrency(InEffectConcurrency);
 
-	for (int i = 0; i < InMaxBGMCount; ++i)
+	m_nEffectMaxCount = m_pEffectConcurrency.IsValid() ? m_pEffectConcurrency->Concurrency.MaxCount : 10;
+
+	m_nCurrentEffectIndex = 0;
+
+	m_bInit = true;
+}
+
+ABGMActor* SoundManager::GetBGMActor(int InBGMType)
+{
+	if (m_BGMActorMap.Contains(InBGMType) == false)
 	{
-		ABGMActor* Actor = InWorld->SpawnActor<ABGMActor>();
+		UE_LOG(LogTemp, Log, TEXT("%s"), *m_pWorld->GetName());
+		ABGMActor* Actor = GetWorld()->SpawnActor<ABGMActor>();
 		Actor->SetConcurrency(m_pBGMConcurrency.Get());
 		Actor->AudioFinishedDelegate.AddRaw(this, &SoundManager::RemoveReferenceCount);
 
-		m_BGMActorMap.Add(i, Actor);
+		m_BGMActorMap.Add(InBGMType, Actor);
 	}
-
-	m_nEffectMaxCount = m_pEffectConcurrency.IsValid() ? m_pEffectConcurrency->Concurrency.MaxCount : 10;
-	for (int i = 0; i < m_nEffectMaxCount; ++i)
+	else if (m_BGMActorMap[InBGMType].IsValid() == false)
 	{
-		ASFXActor* Actor = InWorld->SpawnActor<ASFXActor>();
+		ABGMActor* Actor = GetWorld()->SpawnActor<ABGMActor>();
+		Actor->SetConcurrency(m_pBGMConcurrency.Get());
 		Actor->AudioFinishedDelegate.AddRaw(this, &SoundManager::RemoveReferenceCount);
 
-		m_EffectActorList.Add(Actor);
+		m_BGMActorMap[InBGMType] = Actor;
 	}
 
-	m_nCurrentEffectIndex = 0;
+	return m_BGMActorMap[InBGMType].Get();
+}
+
+ASFXActor* SoundManager::GetEffectActor(int InIndex)
+{
+	if (m_EffectActorMap.Contains(InIndex) == false)
+	{
+		ASFXActor* Actor = GetWorld()->SpawnActor<ASFXActor>();
+		Actor->AudioFinishedDelegate.AddRaw(this, &SoundManager::RemoveReferenceCount);
+
+		m_EffectActorMap.Add(InIndex, Actor);
+	}
+	else if (m_EffectActorMap[InIndex].IsValid() == false)
+	{
+		ASFXActor* Actor = GetWorld()->SpawnActor<ASFXActor>();
+		Actor->AudioFinishedDelegate.AddRaw(this, &SoundManager::RemoveReferenceCount);
+
+		m_EffectActorMap[InIndex] = Actor;
+	}
+
+	return m_EffectActorMap[InIndex].Get();
 }
 
 bool SoundManager::Load(const FString& InPath)
@@ -105,11 +134,11 @@ void SoundManager::PlayEffect(const FString& InPath)
 
 	m_SoundMap[InPath]->bLooping = false;
 	AddReferenceCount(m_SoundMap[InPath]);
-	m_EffectActorList[m_nCurrentEffectIndex]->PlayEffect(m_SoundMap[InPath]);
+	GetEffectActor(m_nCurrentEffectIndex)->PlayEffect(m_SoundMap[InPath]);
 	m_nCurrentEffectIndex = (m_nCurrentEffectIndex + 1) % m_nEffectMaxCount;
 }
 
-void SoundManager::PlayBGM(int InBGMType, const FString& InPath, bool InIsFadeIn, float InFadeInDuration)
+void SoundManager::PlayBGM(int InBGMType, const FString& InPath, bool InIsFadeIn, float InTargetVolume, float InFadeInDuration)
 {
 	//if (FAudioDevice* Device = GEngine->GetActiveAudioDevice())
 	//{
@@ -124,14 +153,22 @@ void SoundManager::PlayBGM(int InBGMType, const FString& InPath, bool InIsFadeIn
 		return;
 	}
 
-	if (Load(InPath) == false)
+	FString CurrentPath = InPath;
+
+	if (Load(CurrentPath) == false)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Failed to PlayBGM - %s is invalid"), *InPath);
 		return;
 	}
 
-	AddReferenceCount(m_SoundMap[InPath]);
-	m_BGMActorMap[InBGMType]->PlayBGM(m_SoundMap[InPath], InIsFadeIn, InFadeInDuration);
+	ABGMActor* Actor = GetBGMActor(InBGMType);
+	if (Actor->IsPlaying())
+	{
+		m_pPrevBGMPath = Actor->GetSoundPath();
+	}
+
+	AddReferenceCount(m_SoundMap[CurrentPath]);
+	Actor->PlayBGM(m_SoundMap[CurrentPath], InIsFadeIn, InTargetVolume, InFadeInDuration);
 
 	if (m_LatestBGMPathMap.Contains(InBGMType))
 	{
@@ -139,7 +176,18 @@ void SoundManager::PlayBGM(int InBGMType, const FString& InPath, bool InIsFadeIn
 	}
 }
 
-void SoundManager::StopBGM(int InBGMType, bool InIsFadeOut /*= false*/, float InFadeOutDuration /*= 1.0f*/)
+void SoundManager::PlayPrevBGM(int InBGMType, bool InIsFadeIn /*= false*/, float InTargetVolume /*= 1.0f*/, float InFadeInDuration /*= 1.0f*/)
+{
+	if (m_pPrevBGMPath.IsEmpty())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to PlayPrevBGM - Not played bgm"));
+		return;
+	}
+
+	PlayBGM(InBGMType, m_pPrevBGMPath, InIsFadeIn, InTargetVolume, InFadeInDuration);
+}
+
+void SoundManager::StopBGM(int InBGMType, bool InIsFadeOut /*= false*/, float InTargetVolume, float InFadeOutDuration /*= 1.0f*/)
 {
 	SaveLatestBGMPath(InBGMType);
 
@@ -156,9 +204,9 @@ void SoundManager::StopAllBGM(bool InIsFadeOut, float InFadeOutDuration)
 
 void SoundManager::StopAllEffect()
 {
-	for (auto SFXIter(m_EffectActorList.CreateIterator()); SFXIter; ++SFXIter)
+	for (auto SFXIter(m_EffectActorMap.CreateIterator()); SFXIter; ++SFXIter)
 	{
-		TWeakObjectPtr<ASFXActor> SFX = *SFXIter;
+		TWeakObjectPtr<ASFXActor> SFX = SFXIter.Value();
 		SFX->StopEffect();
 	}
 }
@@ -187,7 +235,7 @@ void SoundManager::SetEffectConcurrency(const FString& InPath)
 
 void SoundManager::SetBGMVolume(int InBGMType, float InVolume, bool InIsTweening, float InDuration)
 {
-	m_BGMActorMap[InBGMType]->SetVolume(InVolume, InIsTweening, InDuration);
+	GetBGMActor(InBGMType)->SetVolume(InVolume, InIsTweening, InDuration);
 }
 
 void SoundManager::SetBGMAllVolume(float InVolume)
@@ -243,7 +291,6 @@ void SoundManager::AddReferenceCount(USoundWave* InSound)
 	m_SoundReferenceMap[InSound]++;
 
 	UE_LOG(LogTemp, Log, TEXT("%s added ref count: %d"), *InSound->GetName(), m_SoundReferenceMap[InSound]);
-
 }
 
 void SoundManager::RemoveReferenceCount(USoundWave* InSound)
@@ -270,6 +317,4 @@ void SoundManager::RemoveReferenceCount(USoundWave* InSound)
 			}
 		}
 	}
-
 }
-

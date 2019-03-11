@@ -49,9 +49,10 @@ void ABGMActor::Tick(float DeltaSeconds)
 	}
 }
 
-void ABGMActor::PlayBGM(USoundWave* InSound, bool InIsCrossFade, float InCrossFadeDuration)
+void ABGMActor::PlayBGM(USoundWave* InSound, bool InIsCrossFade, float InTargetVolume, float InCrossFadeDuration)
 {
 	InSound->bLooping = true;
+
 	if (m_AudioComponentList.Num() == 0)
 	{
 		// NOTE(JJO): For cross fade (swap)
@@ -63,12 +64,12 @@ void ABGMActor::PlayBGM(USoundWave* InSound, bool InIsCrossFade, float InCrossFa
 		}
 	}
 
-	PlayBGM_Internal(InSound, InIsCrossFade, InCrossFadeDuration);
+	PlayBGM_Internal(InSound, InIsCrossFade, InTargetVolume, InCrossFadeDuration);
 }
 
-void ABGMActor::StopBGM(bool InIsFadeOut, float InFadeOutDuration)
+void ABGMActor::StopBGM(bool InIsFadeOut, float InTargetVolume, float InFadeOutDuration)
 {
-	StopBGM_Internal(InIsFadeOut, InFadeOutDuration);
+	StopBGM_Internal(InIsFadeOut, InTargetVolume, InFadeOutDuration);
 }
 
 bool ABGMActor::IsPlaying()
@@ -110,7 +111,7 @@ void ABGMActor::SetVolume(float InVolume, bool InIsTweening /*= false*/, float I
 	m_bIsVolumeTweening = InIsTweening;
 }
 
-void ABGMActor::PlayBGM_Internal(USoundWave* InSound, bool InIsCrossFade /*= false*/, float InCrossFadeDuration /*= 1.0f*/)
+void ABGMActor::PlayBGM_Internal(USoundWave* InSound, bool InIsCrossFade /*= false*/, float InTargetVolume, float InCrossFadeDuration /*= 1.0f*/)
 {
 	bool IsAlreadyFadeIn = false;
 	bool IsAlreadyFadeOut = false;
@@ -125,7 +126,7 @@ void ABGMActor::PlayBGM_Internal(USoundWave* InSound, bool InIsCrossFade /*= fal
 				if (IsAlreadyFadeIn == false)
 				{
 					Comp->SetSound(InSound);
-					Comp->FadeIn(InCrossFadeDuration);
+					Comp->FadeIn(InCrossFadeDuration, InTargetVolume);
 					IsAlreadyFadeIn = true;
 				}
 			}
@@ -146,7 +147,7 @@ void ABGMActor::PlayBGM_Internal(USoundWave* InSound, bool InIsCrossFade /*= fal
 				Comp->Play();
 
 				// NOTE(JJO): Default play is set to default volume
-				SetVolume(1.0f);
+				SetVolume(InTargetVolume);
 
 				IsAlreadyFadeIn = true;
 			}
@@ -160,7 +161,7 @@ void ABGMActor::PlayBGM_Internal(USoundWave* InSound, bool InIsCrossFade /*= fal
 	m_pCurrentSound = InSound;
 }
 
-void ABGMActor::StopBGM_Internal(bool InIsFadeOut /*= false*/, float InFadeOutDuration /*= 1.0f*/)
+void ABGMActor::StopBGM_Internal(bool InIsFadeOut /*= false*/, float InTargetVolume, float InFadeOutDuration /*= 1.0f*/)
 {
 	for (auto CompIter = m_AudioComponentList.CreateIterator(); CompIter; ++CompIter)
 	{
@@ -170,7 +171,7 @@ void ABGMActor::StopBGM_Internal(bool InIsFadeOut /*= false*/, float InFadeOutDu
 			if (Comp->IsPlaying())
 			{
 				AudioFinishedDelegate.Broadcast(Cast<USoundWave>(Comp->Sound));
-				Comp->FadeOut(InFadeOutDuration, 0.0f);
+				Comp->FadeOut(InFadeOutDuration, InTargetVolume);
 			}
 		}
 		else

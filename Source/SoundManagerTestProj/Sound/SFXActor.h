@@ -14,8 +14,8 @@ class SOUNDMANAGERTESTPROJ_API ASFXActor : public AActor
 	TWeakObjectPtr<USoundWave> m_pSoundWave;
 	TWeakObjectPtr<UAudioComponent> m_pAudioComponent;
 	TWeakObjectPtr<USoundConcurrency> m_pSoundConcurrency;
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	ASFXActor();
 
